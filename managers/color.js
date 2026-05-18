@@ -28,7 +28,7 @@ class Color {
 }
 
 /**
- * the standard 16 color palette.
+ * the standard 8 color palette.
  */
 class Color3Bit extends Color {
   bits = 3;
