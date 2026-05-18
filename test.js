@@ -1,0 +1,38 @@
+import util from "node:util";
+import { Components } from "./components/index.js";
+import { Colors } from "./managers/color.js";
+import { Screen } from "./managers/screen.js";
+import { write } from "./tty.js";
+import { setup, stdout } from "./tty.js";
+
+let current;
+
+function handleKey(str, key) {
+  if (str === `\r`) {
+    current.toggle();
+  }
+}
+
+async function redraw() {
+  // Colors.setColor(0, 255, 240);
+  // Colors.setBackground(20, 20, 50);
+  Colors.setColor(Colors.predefined.White);
+  Colors.setBackground(Colors.predefined.Blue);
+
+  await Screen.clear();
+  const { columns, rows } = Screen;
+
+  write(
+    `Test Application (dims = ${columns} by ${rows}, bit depth = ${stdout.getColorDepth()}`,
+  );
+
+  current = new Components.filterItem({
+    row: 3,
+    column: 10,
+    label: `Does this work?`,
+  });
+
+  current.draw();
+}
+
+setup(redraw, handleKey);
