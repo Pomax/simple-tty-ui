@@ -16,7 +16,6 @@ class Color {
   async restore() {
     const [fg, bg] = [await tty(`10`, true), await tty(`11`, true)].map(
       (codes) => {
-        console.log(codes);
         const [_, r, g, b] = codes.match(
           /rgb:([0-9a-f]+)\/([0-9a-f]+)\/([0-9a-f]+)/,
         );
