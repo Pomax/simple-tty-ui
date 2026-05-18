@@ -1,4 +1,5 @@
 import util from "node:util";
+import { initColors } from "./managers/color.js";
 import { Screen } from "./managers/screen.js";
 import { emitKeypressEvents } from "node:readline";
 
@@ -7,8 +8,6 @@ const { stdin, stdout } = process;
 export { stdin, stdout };
 
 const mark = `\x1b`;
-
-emitKeypressEvents(stdin);
 
 /**
  * Hide the cursor in the terminal.
@@ -60,35 +59,38 @@ export function enableResize(redraw) {
 }
 
 /**
+ * Make sure we cleanly exit, restoring
+ * the original colors, the cursor, and
+ * input mode.
+ */
+async function exit() {
+  Screen.restore();
+  await Screen.clear();
+  showCursor();
+  stdin.setRawMode(false);
+  stdin.pause();
+  process.exit();
+}
+
+/**
  * Set up TTY handling.
  */
 export function setup(redraw, handleKey) {
-  if (stdin.isTTY) {
-    // We want to be able to deal with user input,
-    // even if we don't show key presses.
-    stdin.setRawMode(true);
-    stdin.on("keypress", (str, key) => {
-      if (key && key.ctrl && key.name === "c") {
-        exit();
-      }
-      if (key.name === `escape`) {
-        exit();
-      }
-      handleKey(str, key);
-    });
-  }
+  emitKeypressEvents(stdin);
+  initColors(stdout.getColorDepth());
 
-  // Make sure we cleanly exit, restoring
-  // the original colors, the cursor, and
-  // input mode.
-  async function exit() {
-    Screen.restore();
-    await Screen.clear();
-    showCursor();
-    stdin.setRawMode(false);
-    stdin.pause();
-    process.exit();
-  }
+  // We want to be able to deal with user input,
+  // even if we don't show key presses.
+  stdin.setRawMode(true);
+  stdin.on("keypress", (str, key) => {
+    if (key && key.ctrl && key.name === "c") {
+      exit();
+    }
+    if (key.name === `escape`) {
+      exit();
+    }
+    handleKey(str, key);
+  });
 
   hideCursor();
   enableResize(redraw);

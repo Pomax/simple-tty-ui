@@ -14,16 +14,14 @@ function handleKey(str, key) {
 }
 
 async function redraw() {
-  // Colors.setColor(0, 255, 240);
-  // Colors.setBackground(20, 20, 50);
-  Colors.setColor(Colors.predefined.White);
-  Colors.setBackground(Colors.predefined.Blue);
+  Colors.setColor(255, 255, 240);
+  Colors.setBackground(20, 20, 55);
 
   await Screen.clear();
   const { columns, rows } = Screen;
 
   write(
-    `Test Application (dims = ${columns} by ${rows}, bit depth = ${stdout.getColorDepth()}`,
+    `Test Application (dims = ${columns} by ${rows}, ${Colors.bits} bit color)`,
   );
 
   current = new Components.filterItem({
