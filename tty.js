@@ -22,7 +22,9 @@ export const showCursor = () => ansi("?25h");
 /**
  * Write data to stdout.
  */
-export const write = (string) => stdout.write(string);
+export const write = async (string) => {
+  stdout.write(string);
+};
 
 /**
  * Run an ANSI coded command to stdout.
@@ -63,7 +65,7 @@ export function enableResize(redraw) {
  * the original colors, the cursor, and
  * input mode.
  */
-async function exit() {
+export async function exit() {
   Screen.restore();
   await Screen.clear();
   showCursor();
@@ -79,18 +81,20 @@ export function setup(redraw, handleKey) {
   emitKeypressEvents(stdin);
   initColors(stdout.getColorDepth());
 
-  // We want to be able to deal with user input,
-  // even if we don't show key presses.
-  stdin.setRawMode(true);
-  stdin.on("keypress", (str, key) => {
-    if (key && key.ctrl && key.name === "c") {
-      exit();
-    }
-    if (key.name === `escape`) {
-      exit();
-    }
-    handleKey(str, key);
-  });
+  if (process.stdout.isTTY) {
+    // We want to be able to deal with user input,
+    // even if we don't show key presses.
+    stdin.setRawMode(true);
+    stdin.on("keypress", (str, key) => {
+      if (key && key.ctrl && key.name === "c") {
+        exit();
+      }
+      if (key.name === `escape`) {
+        exit();
+      }
+      handleKey(str, key);
+    });
+  }
 
   hideCursor();
   enableResize(redraw);

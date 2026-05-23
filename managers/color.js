@@ -8,6 +8,8 @@ const { stdin, stdout } = process;
  */
 class Color {
   bits = 0;
+  fg = 0;
+  bg = 0;
 
   /**
    * Reset the terminal to its normal colors. This is a
@@ -24,6 +26,14 @@ class Color {
     );
     this.setColor(...fg);
     this.setBackground(...bg);
+  }
+
+  async highlight() {
+    return false;
+  }
+
+  async standard() {
+    return false;
   }
 }
 
@@ -44,11 +54,13 @@ class Color3Bit extends Color {
     White: 7,
   };
 
-  setColor(c) {
+  async setColor(c) {
+    fg = c;
     return ansi(`${30 + c}m`);
   }
 
-  setBackground(c) {
+  async setBackground(c) {
+    bg = c;
     return ansi(`${40 + c}m`);
   }
 }
@@ -59,13 +71,15 @@ class Color3Bit extends Color {
 class Color4Bit extends Color3Bit {
   bits = 4;
 
-  setColor(c, bright = false) {
-    if (!bright) super.setColor(c);
+  async setColor(c, bright = false) {
+    fg = c;
+    if (!bright) return super.setColor(c);
     return ansi(`${90 + c}m`);
   }
 
-  setBackground(c, bright = false) {
-    if (!bright) super.setBackground(c);
+  async setBackground(c, bright = false) {
+    bg = c;
+    if (!bright) return super.setBackground(c);
     return ansi(`${100 + c}m`);
   }
 }
@@ -96,12 +110,14 @@ class Color8Bit extends Color {
     return c;
   }
 
-  setColor(r, g, b) {
-    ansi(`38;5;${this.getColorCode(r, g, b)}m`);
+  async setColor(r, g, b) {
+    this.fg = [r, g, b];
+    return ansi(`38;5;${this.getColorCode(r, g, b)}m`);
   }
 
-  setBackground(r, g, b) {
-    ansi(`48;5;${this.getColorCode(r, g, b)}m`);
+  async setBackground(r, g, b) {
+    this.bg = [r, g, b];
+    return ansi(`48;5;${this.getColorCode(r, g, b)}m`);
   }
 }
 
@@ -111,12 +127,24 @@ class Color8Bit extends Color {
 class Color24Bit extends Color {
   bits = 24;
 
-  setColor(r, g, b) {
-    ansi(`38;2;${r};${g};${b}m`);
+  async setColor(r, g, b) {
+    this.fg = [r, g, b];
+    return ansi(`38;2;${r};${g};${b}m`);
   }
 
-  setBackground(r, g, b) {
-    ansi(`48;2;${r};${g};${b}m`);
+  async setBackground(r, g, b) {
+    this.bg = [r, g, b];
+    return ansi(`48;2;${r};${g};${b}m`);
+  }
+
+  async standard() {
+    const { fg, bg } = this;
+    return ansi(`38;2;${fg.join(`;`)};48;2;${bg.join(`;`)}m`);
+  }
+
+  async highlight() {
+    const { fg, bg } = this;
+    return ansi(`38;2;${bg.join(`;`)};48;2;${fg.join(`;`)}m`);
   }
 }
 

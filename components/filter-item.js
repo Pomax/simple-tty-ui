@@ -11,15 +11,15 @@ export class FilterItem extends CheckboxItem {
     super(Object.assign({}, FilterItem.default, opts));
   }
 
-  toggle() {
+  async toggle() {
     this.checked =
       this.checked === true ? false : this.checked === false ? undefined : true;
-    this.draw();
+    return this.draw();
   }
 
   async draw() {
     const { checked, label } = this;
     const content = `[${checked === true ? `+` : checked === false ? `-` : ` `}] ${label}`;
-    super.draw(content);
+    return super.draw(content);
   }
 }

@@ -1,5 +1,5 @@
 import { Screen } from "../managers/screen.js";
-import { Component } from "./base-component.js";
+import { Component } from "./component.js";
 
 export class CheckboxItem extends Component {
   static default = {
@@ -11,14 +11,14 @@ export class CheckboxItem extends Component {
     super(Object.assign({}, CheckboxItem.default, opts));
   }
 
-  toggle() {
+  async toggle() {
     this.checked = !this.checked;
-    this.draw();
+    return this.draw();
   }
 
   async draw(content) {
     const { checked, label } = this;
     content ??= `[${checked ? `x` : ` `}] ${label}`;
-    super.draw(content);
+    return super.draw(content);
   }
 }

@@ -2,14 +2,23 @@ import util from "node:util";
 import { Components } from "./components/index.js";
 import { Colors } from "./managers/color.js";
 import { Screen } from "./managers/screen.js";
-import { write } from "./tty.js";
+import { exit, write } from "./tty.js";
 import { setup, stdout } from "./tty.js";
 
 let current;
 
 function handleKey(str, key) {
-  if (str === `\r`) {
-    current.toggle();
+  if (key.name === `return` || key.name === `space`) {
+    current?.toggle();
+  }
+  if (key.name === `up`) {
+    current?.previous?.();
+  }
+  if (key.name === `down`) {
+    current?.next?.();
+  }
+  if (str === `q`) {
+    exit();
   }
 }
 
@@ -24,13 +33,21 @@ async function redraw() {
     `Test Application (dims = ${columns} by ${rows}, ${Colors.bits} bit color)`,
   );
 
-  current = new Components.filterItem({
+  const page = new Components.page();
+  current = page;
+
+  const list = new Components.list(Components.filterItem, {
     row: 3,
     column: 10,
-    label: `Does this work?`,
   });
+  page.add(list);
 
-  current.draw();
+  list.add({ label: `Let's try this.`, checked: true });
+  list.add({ label: `Does this work?`, checked: false });
+  list.add({ label: `How about this?` });
+  list.add({ label: `And this one?` });
+
+  await page.select();
 }
 
 setup(redraw, handleKey);
