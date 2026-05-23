@@ -9,7 +9,7 @@ let current;
 
 function handleKey(str, key) {
   if (key.name === `return` || key.name === `space`) {
-    current?.toggle();
+    current?.toggle?.();
   }
   if (key.name === `up`) {
     current?.previous?.();
@@ -36,16 +36,24 @@ async function redraw() {
   const page = new Components.page();
   current = page;
 
-  const list = new Components.list(Components.filterItem, {
-    row: 3,
-    column: 10,
-  });
-  page.add(list);
+  const list = new Components.list(Components.filterItem);
+  page.add(list, 3, 10);
 
   list.add({ label: `Let's try this.`, checked: true });
   list.add({ label: `Does this work?`, checked: false });
   list.add({ label: `How about this?` });
   list.add({ label: `And this one?` });
+
+  const paragraph = new Components.text({
+    text: `This is a paragraph of text`,
+  });
+  page.add(paragraph, page.lastRow + 2, page.column);
+
+  const button = new Components.button({
+    text: `exit`,
+    onClick: () => exit(),
+  });
+  page.add(button, page.lastRow + 2, page.column);
 
   await page.select();
 }

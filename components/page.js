@@ -1,15 +1,20 @@
 import { Component } from "./component.js";
 
 export class Page extends Component {
-  static default = {
-    row: 0,
-    column: 0,
-  };
+  static default = {};
 
   items = [];
 
   constructor(opts = {}) {
     super(Object.assign({}, Page.default, opts));
+  }
+
+  get lastRow() {
+    return this.items.at(-1).lastRow ?? this.row;
+  }
+
+  async toggle() {
+    await this.selected?.toggle?.();
   }
 
   async select(startAtEnd = false) {
@@ -28,27 +33,39 @@ export class Page extends Component {
   }
 
   async next() {
-    const { items } = this;
-    const result = await this.selected?.next();
-    if (result === false) {
+    const { items, selected } = this;
+    await selected?.unhighlight();
+    const result = await this.selected?.next?.();
+    if (!result) {
       const idx = items.indexOf(this.selected);
       this.selected = items.at((idx + 1) % items.length);
-      this.selected?.select();
+      if (this.selected?.select) {
+        this.selected.select();
+      } else {
+        this.next();
+      }
     }
   }
 
   async previous() {
-    const { items } = this;
-    const result = await this.selected?.previous();
-    if (result === false) {
+    const { items, selected } = this;
+    await selected?.unhighlight();
+    const result = await this.selected?.previous?.();
+    if (!result) {
       const idx = items.indexOf(this.selected);
       this.selected = items.at(idx - 1);
-      this.selected?.select(true);
+      if (this.selected?.select) {
+        this.selected?.select(true);
+      } else {
+        this.previous();
+      }
     }
   }
 
-  add(item) {
+  add(item, row = 0, column = 0) {
     const { items } = this;
+    item.row = row;
+    item.column = column;
     items.push(item);
   }
 

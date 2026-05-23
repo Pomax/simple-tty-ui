@@ -8,16 +8,17 @@ export class List extends Component {
   static Checkbox = CheckboxItem;
   static Filter = FilterItem;
 
-  static default = {
-    row: 0,
-    column: 0,
-  };
+  static default = {};
 
   items = [];
 
   constructor(type, opts = {}) {
     super(Object.assign({}, List.default, opts));
     this.type = type;
+  }
+
+  get lastRow() {
+    return this.items.at(-1)?.row ?? this.row;
   }
 
   async select(startAtEnd = false) {

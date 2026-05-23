@@ -4,13 +4,16 @@ import { ansi, tty, write } from "../tty.js";
 
 export class Component {
   static default = {
-    row: 0,
-    column: 0,
-    active: false,
+    row: 1,
+    column: 1,
   };
 
   constructor(opts = {}) {
     Object.assign(this, Component.default, opts);
+  }
+
+  get lastRow() {
+    return this.row;
   }
 
   async highlight() {
