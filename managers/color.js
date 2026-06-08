@@ -119,6 +119,20 @@ class Color8Bit extends Color {
     this.bg = [r, g, b];
     return ansi(`48;5;${this.getColorCode(r, g, b)}m`);
   }
+
+  async standard() {
+    const { fg, bg } = this;
+    return ansi(
+      `38;5;${this.getColorCode(...fg)};48;5;${this.getColorCode(...bg)}m`,
+    );
+  }
+
+  async highlight() {
+    const { fg, bg } = this;
+    return ansi(
+      `38;5;${this.getColorCode(...bg)};48;5;${this.getColorCode(...fg)}m`,
+    );
+  }
 }
 
 /**

@@ -26,6 +26,11 @@ export const write = async (string) => {
   stdout.write(string);
 };
 
+export const log = async (string) => {
+  await Screen.setCursorForLogging();
+  return write(string);
+}
+
 /**
  * Run an ANSI coded command to stdout.
  */
@@ -77,7 +82,7 @@ export async function exit() {
 /**
  * Set up TTY handling.
  */
-export function setup(redraw, handleKey) {
+export async function setup(draw, handleKey) {
   emitKeypressEvents(stdin);
   initColors(stdout.getColorDepth());
 
@@ -97,6 +102,6 @@ export function setup(redraw, handleKey) {
   }
 
   hideCursor();
-  enableResize(redraw);
-  redraw();
+  enableResize(draw);
+  await draw();
 }

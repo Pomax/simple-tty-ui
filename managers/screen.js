@@ -10,6 +10,7 @@ export const Screen = new (class {
   columns = 0;
   currentRow = 0;
   currentColumn = 0;
+  border = false;
 
   restore() {
     ansi(`0m`);
@@ -17,6 +18,10 @@ export const Screen = new (class {
 
   async setCursor(row, column) {
     await ansi(`${row};${column}H`);
+  }
+
+  async setCursorForLogging() {
+    this.setCursor(this.rows - (this.border ? 1 : 0), this.border ? 2 : 1);
   }
 
   async getCursor() {
@@ -32,20 +37,9 @@ export const Screen = new (class {
   }
 
   async clear() {
-    // reset
     console.clear();
-
-    // move to impossible position, which places the
-    // cursor on the last available coordinate
-    await this.setCursor(9999, 9999);
-    const pos = await this.getCursor();
-
-    // get the terminal dimensions based on that.
-    this.rows = pos[0];
-    this.columns = pos[1];
-
-    // then set the cursor at (0,0)
-    await ansi(`0;0H`);
+    this.rows = process.stdout.rows;
+    this.columns = process.stdout.columns;
   }
 
   async writeToScreen(

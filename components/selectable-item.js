@@ -1,25 +1,23 @@
 import { Screen } from "../managers/screen.js";
 import { Component } from "./component.js";
 
-export class CheckboxItem extends Component {
+export class SelectableItem extends Component {
   static default = {
     label: `missing label`,
-    checked: false,
   };
 
-  constructor(opts = CheckboxItem.default) {
-    super(Object.assign({}, CheckboxItem.default, opts));
+  constructor(opts = SelectableItem.default) {
+    super(Object.assign({}, SelectableItem.default, opts));
   }
 
   async toggle() {
-    this.checked = !this.checked;
+    // rather than a toggle, this is a "okay do the thing"
     this.onClick?.(this.label, this.checked);
     return this.draw();
   }
 
   async draw(content) {
-    const { checked, label } = this;
-    content ??= `[${checked ? `x` : ` `}] ${label}`;
+    content ??= `- ${this.label}`;
     return super.draw(content);
   }
 }

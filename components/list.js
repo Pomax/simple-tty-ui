@@ -30,8 +30,7 @@ export class List extends Component {
   }
 
   async unselect() {
-    await this.selected?.unhighlight();
-    this.selected = undefined;
+    this.selected = await this.selected?.unhighlight();
   }
 
   async next() {
@@ -75,8 +74,6 @@ export class List extends Component {
 
   async draw() {
     const { row, column, items } = this;
-    for (const item of items) {
-      await item.draw();
-    }
+    for (const item of items) await item.draw();
   }
 }
