@@ -3,8 +3,9 @@ import { CheckboxItem } from "./checkbox-item.js";
 import { FilterItem } from "./filter-item.js";
 import { Screen } from "../managers/screen.js";
 import { log } from "../file-writer.js";
+import { write, exit } from "../tty.js";
 
-const { ceil } = Math;
+const { ceil, max } = Math;
 
 export class List extends Component {
   static Checkbox = CheckboxItem;
@@ -19,14 +20,19 @@ export class List extends Component {
     this.type = type;
   }
 
-  get lastRow() {
-    return this.items.at(-1)?.row ?? this.row;
+  get width() {
+    return max(...this.items.map((e) => e.width));
+  }
+
+  get height() {
+    return this.items.reduce((t, e) => t + e.height, 0);
   }
 
   async select(startAtEnd = false) {
     const { items } = this;
     if (!this.selected && items.length) {
-      this.selected = items.at(startAtEnd ? -1 : 0);
+      const selected = items.at(startAtEnd ? -1 : 0);
+      this.selected = selected;
       await this.selected?.highlight();
     }
   }
@@ -66,30 +72,34 @@ export class List extends Component {
   }
 
   add(opts) {
-    const { items } = this;
-    opts.row = this.row + items.length;
-    opts.column = this.column;
-    const item = new this.type(opts);
+    const { items, row, column, height, type: ItemType } = this;
+    opts.row = row + height;
+    opts.column = column + 1;
+    const item = new ItemType(opts);
     items.push(item);
     return item;
   }
 
   async draw() {
-    const { row, column, items } = this;
-    for (const item of items) await item.draw();
+    for (const item of this.items) await item.draw();
   }
 
   async reflow(rows, total) {
-    const { items } = this;
+    return;
+
+    const { items, height } = this;
     const { length } = items;
 
-    const height = this.lastRow - this.row;
     const ideal = ceil(rows / total);
 
     // do we even need to reflow?
     if (height < ideal) {
       return rows - height;
     }
+
+    console.clear();
+    console.log(`we need to reflow`);
+    exit(false);
 
     // for now let's assume we have the entire width availabe: what's a decent cutoff?
     const d = ceil(length / ideal);

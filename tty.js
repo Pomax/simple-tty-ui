@@ -29,7 +29,7 @@ export const write = async (string) => {
 export const log = async (string) => {
   await Screen.setCursorForLogging();
   const { width } = Screen;
-  string = string + ` `.repeat(width - string.length - (Screen.border ? 2 : 0));
+  string = string + ` `.repeat(width - string.length - Screen.padding * 2);
   return write(string);
 };
 
@@ -72,9 +72,9 @@ export function enableResize(redraw) {
  * the original colors, the cursor, and
  * input mode.
  */
-export async function exit() {
+export async function exit(clearScreen = true) {
   Screen.restore();
-  await Screen.clear();
+  if (clearScreen) await Screen.clear();
   showCursor();
   stdin.setRawMode(false);
   stdin.pause();
@@ -105,5 +105,5 @@ export async function setup(draw, handleKey) {
 
   hideCursor();
   enableResize(draw);
-  await draw();
+  await draw(false);
 }

@@ -1,7 +1,7 @@
 import { Screen } from "../managers/screen.js";
-import { Component } from "./component.js";
+import { ActionItem } from "./action-item.js";
 
-export class CheckboxItem extends Component {
+export class CheckboxItem extends ActionItem {
   static default = {
     label: `missing label`,
     checked: false,
@@ -9,6 +9,14 @@ export class CheckboxItem extends Component {
 
   constructor(opts = CheckboxItem.default) {
     super(Object.assign({}, CheckboxItem.default, opts));
+  }
+
+  get width() {
+    return this.label.length + 4;
+  }
+
+  get height() {
+    return 1;
   }
 
   async toggle() {

@@ -10,18 +10,26 @@ export const Screen = new (class {
   columns = 0;
   currentRow = 0;
   currentColumn = 0;
-  border = false;
-
-  restore() {
-    ansi(`0m`);
-  }
+  padding = 0;
 
   get width() {
-    return this.columns - (this.border ? 2 : 0);
+    return this.columns;
+  }
+
+  get innerWidth() {
+    return this.width - this.padding * 2;
   }
 
   get height() {
-    return this.rows - (this.border ? 2 : 0);
+    return this.rows;
+  }
+
+  get innerHeight() {
+    return this.height - this.padding * 2;
+  }
+
+  setPadding(padding) {
+    this.padding = padding;
   }
 
   async setCursor(row, column) {
@@ -29,7 +37,7 @@ export const Screen = new (class {
   }
 
   async setCursorForLogging() {
-    this.setCursor(this.rows - (this.border ? 1 : 0), this.border ? 2 : 1);
+    this.setCursor(this.rows - this.padding, this.padding);
   }
 
   async getCursor() {
@@ -57,5 +65,9 @@ export const Screen = new (class {
   ) {
     ansi(`${row};${column}H${string}`);
     this.updateCursor();
+  }
+
+  restore() {
+    ansi(`0m`);
   }
 })();

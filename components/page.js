@@ -1,31 +1,29 @@
 import { Component } from "./component.js";
 import { Screen } from "../managers/screen.js";
 import { Colors } from "../managers/color.js";
-import { write } from "../tty.js";
+import { exit, write } from "../tty.js";
 import { log } from "../file-writer.js";
 
 export class Page extends Component {
-  static default = {
-    ox: 0,
-    oy: 0,
-  };
+  static default = {};
 
   items = [];
 
   constructor(opts = {}) {
     super(Object.assign({}, Page.default, opts));
-    if (this.border) {
-      this.ox = 1;
-      this.oy = 1;
-    }
+    const { padding } = Screen;
+    this.row = 1 + padding;
+    this.column = 1 + padding;
   }
 
-  get border() {
-    return Screen.border;
+  get width() {
+    return Screen.innerWidth;
   }
 
-  get lastRow() {
-    return this.items.at(-1).lastRow ?? this.row;
+  get height() {
+    const { items } = this;
+    if (!items.length) return 0;
+    return items.length - 1 + items.reduce((t, e) => t + e.height, 0);
   }
 
   async toggle() {
@@ -35,11 +33,11 @@ export class Page extends Component {
   async select(startAtEnd = false) {
     const { items } = this;
     if (!items.length) return;
-    if (startAtEnd) items.reserve();
-    this.selected = items.find((e) => e.select);
-    if (startAtEnd) items.reserve();
+    if (startAtEnd) items.reverse();
+    const selected = items.find((e) => e.select);
+    if (startAtEnd) items.reverse();
+    this.selected = selected;
     await this.selected?.select?.();
-    await this.draw();
   }
 
   async unselect() {
@@ -79,12 +77,25 @@ export class Page extends Component {
     }
   }
 
-  add(item, row = this.items?.at(-1)?.lastRow ?? 0 + 1, column = 1) {
-    const { items, ox, oy } = this;
-    item.row = row + ox + (items.length ? 1 : 0);
-    item.column = column + oy;
+  add(item) {
+    const { items } = this;
+    item.row = this.row + this.height + (items.length ? 1 : 0);
+    item.column = this.column;
     items.push(item);
     return item;
+  }
+
+  async draw() {
+    const { padding, width, height } = Screen;
+    const { items } = this;
+
+    if (padding > 0) {
+      await this.drawBorder(height, width);
+    }
+
+    for (const item of items) {
+      await item.draw();
+    }
   }
 
   async drawBorder(rows, columns) {
@@ -106,20 +117,9 @@ export class Page extends Component {
     write(bottomLine);
   }
 
-  async draw() {
-    const { border, rows, columns } = Screen;
-    const { items } = this;
-
-    if (border) {
-      await this.drawBorder(rows, columns);
-    }
-
-    for (const item of items) {
-      await item.draw();
-    }
-  }
-
   async reflow() {
+    return;
+
     // Try to fit the content based on positioning constraints
 
     //    Colors.restore();
@@ -127,13 +127,14 @@ export class Page extends Component {
     //    console.clear();
     //    console.log(`resizing...`);
 
-    const { rows, border, height } = Screen;
+    const { rows, padding, innerHeight } = Screen;
     const { resizable, fixed } = getRegions(this);
-    const { lastRow } = this;
+    const { row, height } = this;
+    const lastRow = row + height;
 
     // do we need to reflow this content?
-    if (this.lastRow - (border ? 1 : 0) > Screen.height) {
-      let available = height - fixed;
+    if (lastRow + padding > innerHeight) {
+      let available = innerHeightÏ - fixed;
       log(
         `There are ${available} rows for reflow over ${resizable} components`,
       );

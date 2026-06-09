@@ -1,5 +1,5 @@
+import { ActionItem } from "./action-item.js";
 import { Button } from "./button.js";
-import { SelectableItem } from "./selectable-item.js";
 import { CheckboxItem } from "./checkbox-item.js";
 import { FilterItem } from "./filter-item.js";
 import { List } from "./list.js";
@@ -16,5 +16,5 @@ export const Components = {
   list: List,
   checkboxItem: CheckboxItem,
   filterItem: FilterItem,
-  selectableItem: SelectableItem,
+  actionItem: ActionItem,
 };
