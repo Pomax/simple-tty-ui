@@ -28,8 +28,10 @@ export const write = async (string) => {
 
 export const log = async (string) => {
   await Screen.setCursorForLogging();
+  const { width } = Screen;
+  string = string + ` `.repeat(width - string.length - (Screen.border ? 2 : 0));
   return write(string);
-}
+};
 
 /**
  * Run an ANSI coded command to stdout.

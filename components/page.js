@@ -1,11 +1,11 @@
 import { Component } from "./component.js";
 import { Screen } from "../managers/screen.js";
 import { Colors } from "../managers/color.js";
-import { write, log } from "../tty.js";
+import { write } from "../tty.js";
+import { log } from "../file-writer.js";
 
 export class Page extends Component {
   static default = {
-    border: false,
     ox: 0,
     oy: 0,
   };
@@ -18,6 +18,10 @@ export class Page extends Component {
       this.ox = 1;
       this.oy = 1;
     }
+  }
+
+  get border() {
+    return Screen.border;
   }
 
   get lastRow() {
@@ -84,6 +88,8 @@ export class Page extends Component {
   }
 
   async drawBorder(rows, columns) {
+    Colors.standard();
+
     const topLine = `╔${`═`.repeat(columns - 2)}╗`;
     await Screen.setCursor(1, 1);
     write(topLine);
@@ -101,8 +107,8 @@ export class Page extends Component {
   }
 
   async draw() {
-    const { rows, columns } = Screen;
-    const { border, items } = this;
+    const { border, rows, columns } = Screen;
+    const { items } = this;
 
     if (border) {
       await this.drawBorder(rows, columns);
@@ -115,21 +121,27 @@ export class Page extends Component {
 
   async reflow() {
     // Try to fit the content based on positioning constraints
-    Colors.restore();
-    Screen.restore();
-    console.clear();
 
-    console.log(`resizing...`);
+    //    Colors.restore();
+    //    Screen.restore();
+    //    console.clear();
+    //    console.log(`resizing...`);
 
-    const { rows } = Screen;
-    const { resizable, fixed, height } = getRegions(this);
-    if (height > Screen.rows) {
-      const available = height - fixed;
-      console.log(`total available reflow lines: ${available}`)
-      const rbh = (available / resizable) | 0;
-      console.log(`redistributing for ${rbh} each`);
+    const { rows, border, height } = Screen;
+    const { resizable, fixed } = getRegions(this);
+    const { lastRow } = this;
+
+    // do we need to reflow this content?
+    if (this.lastRow - (border ? 1 : 0) > Screen.height) {
+      let available = height - fixed;
+      log(
+        `There are ${available} rows for reflow over ${resizable} components`,
+      );
+      let top = this.row;
       for (const r of this.items) {
-        await r.reflow(rbh);
+        r.row = top;
+        available = await r.reflow(available, resizable);
+        top = r.lastRow + 2;
       }
     }
   }

@@ -16,6 +16,14 @@ export const Screen = new (class {
     ansi(`0m`);
   }
 
+  get width() {
+    return this.columns - (this.border ? 2 : 0);
+  }
+
+  get height() {
+    return this.rows - (this.border ? 2 : 0);
+  }
+
   async setCursor(row, column) {
     await ansi(`${row};${column}H`);
   }

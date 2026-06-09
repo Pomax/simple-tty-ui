@@ -1,0 +1,27 @@
+There are 31 rows for reflow over 2 components
+length: 80, rows: 16, total: 2, d: 5
+length: 3, rows: 7, total: 2, d: 1
+There are 30 rows for reflow over 2 components
+length: 80, rows: 15, total: 2, d: 6
+length: 3, rows: 7, total: 2, d: 1
+There are 31 rows for reflow over 2 components
+length: 80, rows: 16, total: 2, d: 5
+length: 3, rows: 7, total: 2, d: 1
+There are 30 rows for reflow over 2 components
+length: 80, rows: 15, total: 2, d: 6
+length: 3, rows: 7, total: 2, d: 1
+There are 31 rows for reflow over 2 components
+length: 80, rows: 16, total: 2, d: 5
+length: 3, rows: 7, total: 2, d: 1
+There are 30 rows for reflow over 2 components
+length: 80, rows: 15, total: 2, d: 6
+length: 3, rows: 7, total: 2, d: 1
+There are 29 rows for reflow over 2 components
+length: 80, rows: 15, total: 2, d: 6
+length: 3, rows: 6, total: 2, d: 1
+There are 30 rows for reflow over 2 components
+length: 80, rows: 15, total: 2, d: 6
+length: 3, rows: 7, total: 2, d: 1
+There are 31 rows for reflow over 2 components
+length: 80, rows: 16, total: 2, d: 5
+length: 3, rows: 7, total: 2, d: 1

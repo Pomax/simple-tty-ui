@@ -43,17 +43,19 @@ function createFirstPage(rows, columns) {
   const page = new Components.page("main page", { border });
 
   const title = new Components.text({
-    text: `Test Application (dims = ${columns} by ${rows}, ${Colors.bits} bit color)`,
+    text: `Test Application (dims = ${columns} x ${rows}, w/h = ${Screen.width}/${Screen.height}, ${Colors.bits} bit color)`,
   });
   page.add(title);
 
   const list = page.add(
     new Components.list(Components.filterItem, {
+      label: `filters`,
       resize: true,
     }),
   );
 
-  for (let i = 0; i < 10; i++) {
+  const test = 20;
+  for (let i = 0; i < test; i++) {
     list.add({ label: `Let's try this.`, checked: true });
     list.add({ label: `Does this work?`, checked: false });
     list.add({ label: `How about this?` });
@@ -68,6 +70,7 @@ function createFirstPage(rows, columns) {
 
   const options = page.add(
     new Components.list(Components.selectableItem, {
+      label: `options`,
       resize: true,
     }),
   );
@@ -109,9 +112,8 @@ async function draw() {
   current = page;
 
   // and then select the first thing on that page.
-  log(`selecting...`);
-  await page.select();
   await page.reflow();
+  await page.select();
 }
 
 // let's start our terminal app

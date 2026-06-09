@@ -29,11 +29,27 @@ class Color {
   }
 
   async highlight() {
-    return false;
+    throw new Error(
+      `highlight() is not implemented in ${this.__proto__.constructore.name}`,
+    );
   }
 
   async standard() {
-    return false;
+    throw new Error(
+      `standard() is not implemented in ${this.__proto__.constructore.name}`,
+    );
+  }
+
+  async setColor(c) {
+    throw new Error(
+      `setColor is not implemented in ${this.__proto__.constructore.name}`,
+    );
+  }
+
+  async setBackground(c) {
+    throw new Error(
+      `setBackground is not implemented in ${this.__proto__.constructore.name}`,
+    );
   }
 }
 
@@ -55,12 +71,12 @@ class Color3Bit extends Color {
   };
 
   async setColor(c) {
-    fg = c;
+    this.fg = c;
     return ansi(`${30 + c}m`);
   }
 
   async setBackground(c) {
-    bg = c;
+    this.bg = c;
     return ansi(`${40 + c}m`);
   }
 }
@@ -72,13 +88,13 @@ class Color4Bit extends Color3Bit {
   bits = 4;
 
   async setColor(c, bright = false) {
-    fg = c;
+    this.fg = c;
     if (!bright) return super.setColor(c);
     return ansi(`${90 + c}m`);
   }
 
   async setBackground(c, bright = false) {
-    bg = c;
+    this.bg = c;
     if (!bright) return super.setBackground(c);
     return ansi(`${100 + c}m`);
   }

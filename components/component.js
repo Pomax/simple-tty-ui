@@ -6,6 +6,8 @@ export class Component {
   static default = {
     row: 1,
     column: 1,
+    // width: 0,
+    // height: 1,
     resize: false,
   };
 
@@ -26,7 +28,7 @@ export class Component {
 
   async highlight() {
     this.highlighted = true;
-    await log(`highlighting item "${this.label}"`);
+    // await log(`highlighting item "${this.label}"`);
     await this.draw();
   }
 
@@ -46,8 +48,7 @@ export class Component {
     return write(content);
   }
 
-  async reflow(rows) {
-    if (!this.resize) return;
-    console.log(`reflowing over ${rows}...`);
+  async reflow(rows, total) {
+    return rows;
   }
 }

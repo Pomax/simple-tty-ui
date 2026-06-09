@@ -1,8 +1,10 @@
 import { Component } from "./component.js";
-
 import { CheckboxItem } from "./checkbox-item.js";
 import { FilterItem } from "./filter-item.js";
 import { Screen } from "../managers/screen.js";
+import { log } from "../file-writer.js";
+
+const { ceil } = Math;
 
 export class List extends Component {
   static Checkbox = CheckboxItem;
@@ -75,5 +77,35 @@ export class List extends Component {
   async draw() {
     const { row, column, items } = this;
     for (const item of items) await item.draw();
+  }
+
+  async reflow(rows, total) {
+    const { items } = this;
+    const { length } = items;
+
+    const height = this.lastRow - this.row;
+    const ideal = ceil(rows / total);
+
+    // do we even need to reflow?
+    if (height < ideal) {
+      return rows - height;
+    }
+
+    // for now let's assume we have the entire width availabe: what's a decent cutoff?
+    const d = ceil(length / ideal);
+    log(`length: ${length}, rows: ${ideal}, total: ${total}, d: ${d}`);
+    const step = (Screen.width / d) | 0;
+    for (let s = 0; s < d; s++) {
+      const c = s * step;
+      for (let r = 0; r <= ideal; r++) {
+        const i = items[r + s * ideal];
+        if (!i) continue;
+        i.row = this.row + r;
+        i.column = this.column + c;
+      }
+    }
+
+    // ...compute new height...
+    return rows - ideal - 2;
   }
 }
