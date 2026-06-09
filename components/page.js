@@ -1,4 +1,8 @@
 import { Component } from "./component.js";
+import { Screen } from "../managers/screen.js";
+import { Colors } from "../managers/color.js";
+import { exit, write } from "../tty.js";
+import { log } from "../file-writer.js";
 
 export class Page extends Component {
   static default = {};
@@ -7,10 +11,20 @@ export class Page extends Component {
 
   constructor(opts = {}) {
     super(Object.assign({}, Page.default, opts));
+    const { padding } = Screen;
+    this.row = 1 + padding;
+    this.column = 1 + padding;
   }
 
-  get lastRow() {
-    return this.items.at(-1).lastRow ?? this.row;
+  get width() {
+    return Screen.innerWidth;
+  }
+
+  get height() {
+    const { items } = this;
+    const len = items.length;
+    if (!len) return 0;
+    return len - 1 + items.reduce((t, e) => t + e.height, 0);
   }
 
   async toggle() {
@@ -20,9 +34,11 @@ export class Page extends Component {
   async select(startAtEnd = false) {
     const { items } = this;
     if (!items.length) return;
-    this.selected = items.at(startAtEnd ? -1 : 0);
-    await this.selected.select();
-    await this.draw();
+    if (startAtEnd) items.reverse();
+    const selected = items.find((e) => e.select);
+    if (startAtEnd) items.reverse();
+    this.selected = selected;
+    await this.selected?.select?.();
   }
 
   async unselect() {
@@ -62,16 +78,85 @@ export class Page extends Component {
     }
   }
 
-  add(item, row = 0, column = 0) {
+  add(item) {
     const { items } = this;
-    item.row = row;
-    item.column = column;
+    item.row = this.row + this.height + (items.length ? 1 : 0);
+    item.column = this.column;
     items.push(item);
+    return item;
   }
 
   async draw() {
-    for (const item of this.items) {
+    const { padding, width, height } = Screen;
+    const { items } = this;
+
+    if (padding > 0) {
+      await this.drawBorder(height, width);
+    }
+
+    for (const item of items) {
       await item.draw();
     }
   }
+
+  async drawBorder(rows, columns) {
+    Colors.standard();
+
+    const topLine = `╔${`═`.repeat(columns - 2)}╗`;
+    await Screen.setCursor(1, 1);
+    write(topLine);
+
+    for (let i = 2; i < rows; i++) {
+      await Screen.setCursor(i, 1);
+      write(`║`);
+      await Screen.setCursor(i, columns);
+      write(`║`);
+    }
+
+    const bottomLine = `╚${`═`.repeat(columns - 2)}╝`;
+    await Screen.setCursor(rows, 1);
+    write(bottomLine);
+  }
+
+  async reflow() {
+    // Try to fit the content based on positioning constraints
+
+    const { rows, padding, innerHeight } = Screen;
+    let { resizable, fixed } = getRegions(this);
+    const { row, height } = this;
+    const lastRow = row + height;
+
+    // do we need to reflow this content?
+    if (lastRow + padding > innerHeight) {
+      let available = innerHeight - fixed;
+      const enumerated = this.items.map((item, i) => ({ item, i }));
+      for (const { item, i } of enumerated) {
+        if (!item.resize) continue;
+        const reduction = await item.reflow(available, resizable--);
+        // update all downstream rows
+        this.items.slice(i + 1).forEach((item) => {
+          item.move(-reduction);
+        });
+        // then update the available space
+        available -= item.height;
+      }
+    }
+  }
+}
+
+function getRegions(page) {
+  const info = {
+    fixed: 0,
+    height: 0,
+    resizable: 0,
+  };
+  for (const i of page.items) {
+    if (i.resize) {
+      info.resizable++;
+    } else {
+      info.fixed += i.height;
+    }
+    info.height += i.height;
+  }
+  return info;
 }

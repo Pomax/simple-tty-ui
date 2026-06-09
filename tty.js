@@ -26,6 +26,13 @@ export const write = async (string) => {
   stdout.write(string);
 };
 
+export const log = async (string) => {
+  await Screen.setCursorForLogging();
+  const { width } = Screen;
+  string = string + ` `.repeat(width - string.length - Screen.padding * 2);
+  return write(string);
+};
+
 /**
  * Run an ANSI coded command to stdout.
  */
@@ -65,9 +72,9 @@ export function enableResize(redraw) {
  * the original colors, the cursor, and
  * input mode.
  */
-export async function exit() {
+export async function exit(clearScreen = true) {
   Screen.restore();
-  await Screen.clear();
+  if (clearScreen) await Screen.clear();
   showCursor();
   stdin.setRawMode(false);
   stdin.pause();
@@ -77,7 +84,7 @@ export async function exit() {
 /**
  * Set up TTY handling.
  */
-export function setup(redraw, handleKey) {
+export async function setup(draw, handleKey) {
   emitKeypressEvents(stdin);
   initColors(stdout.getColorDepth());
 
@@ -97,6 +104,6 @@ export function setup(redraw, handleKey) {
   }
 
   hideCursor();
-  enableResize(redraw);
-  redraw();
+  enableResize(draw);
+  await draw(false);
 }

@@ -1,3 +1,4 @@
+import { ActionItem } from "./action-item.js";
 import { Button } from "./button.js";
 import { CheckboxItem } from "./checkbox-item.js";
 import { FilterItem } from "./filter-item.js";
@@ -15,4 +16,5 @@ export const Components = {
   list: List,
   checkboxItem: CheckboxItem,
   filterItem: FilterItem,
+  actionItem: ActionItem,
 };
