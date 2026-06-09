@@ -1,6 +1,7 @@
 import { Colors } from "../managers/color.js";
 import { Screen } from "../managers/screen.js";
-import { ansi, tty, write, log } from "../tty.js";
+import { ansi, tty, write, exit } from "../tty.js";
+import { log } from "../file-writer.js";
 
 export class Component {
   static default = {
@@ -24,9 +25,16 @@ export class Component {
     return 0;
   }
 
+  move(rows = 0, columns = 0) {
+    if (!rows && !columns) return;
+    this.row += rows;
+    this.column += columns;
+    const items = this.items ?? [];
+    for (const item of items) item.move(rows, columns);
+  }
+
   async highlight() {
     this.highlighted = true;
-    // await log(`highlighting item "${this.label}"`);
     await this.draw();
   }
 
@@ -46,6 +54,6 @@ export class Component {
   }
 
   async reflow(rows, total) {
-    return rows;
+    return 0;
   }
 }

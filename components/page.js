@@ -22,8 +22,9 @@ export class Page extends Component {
 
   get height() {
     const { items } = this;
-    if (!items.length) return 0;
-    return items.length - 1 + items.reduce((t, e) => t + e.height, 0);
+    const len = items.length;
+    if (!len) return 0;
+    return len - 1 + items.reduce((t, e) => t + e.height, 0);
   }
 
   async toggle() {
@@ -118,31 +119,26 @@ export class Page extends Component {
   }
 
   async reflow() {
-    return;
-
     // Try to fit the content based on positioning constraints
 
-    //    Colors.restore();
-    //    Screen.restore();
-    //    console.clear();
-    //    console.log(`resizing...`);
-
     const { rows, padding, innerHeight } = Screen;
-    const { resizable, fixed } = getRegions(this);
+    let { resizable, fixed } = getRegions(this);
     const { row, height } = this;
     const lastRow = row + height;
 
     // do we need to reflow this content?
     if (lastRow + padding > innerHeight) {
-      let available = innerHeightÏ - fixed;
-      log(
-        `There are ${available} rows for reflow over ${resizable} components`,
-      );
-      let top = this.row;
-      for (const r of this.items) {
-        r.row = top;
-        available = await r.reflow(available, resizable);
-        top = r.lastRow + 2;
+      let available = innerHeight - fixed;
+      const enumerated = this.items.map((item, i) => ({ item, i }));
+      for (const { item, i } of enumerated) {
+        if (!item.resize) continue;
+        const reduction = await item.reflow(available, resizable--);
+        // update all downstream rows
+        this.items.slice(i + 1).forEach((item) => {
+          item.move(-reduction);
+        });
+        // then update the available space
+        available -= item.height;
       }
     }
   }

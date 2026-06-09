@@ -73,7 +73,7 @@ function createFirstPage() {
     }),
   );
 
-  const test = 1;
+  const test = 4;
   for (let i = 0; i < test; i++) {
     selection.add({ label: `Let's try this.`, checked: true });
     selection.add({ label: `Does this work?`, checked: false });
@@ -107,9 +107,9 @@ function createFirstPage() {
     }),
   );
 
-  const options = page.add(
+  const actions = page.add(
     new Components.list(Components.actionItem, {
-      label: `options`,
+      label: `actions`,
       resize: true,
     }),
   );
@@ -120,15 +120,15 @@ function createFirstPage() {
     await currentPage.draw();
   }
 
-  options.add({
+  actions.add({
     label: `Default coloring`,
     onClick: () => setColorProfile(colors.default),
   });
-  options.add({
+  actions.add({
     label: `Safe for work coloring`,
     onClick: () => setColorProfile(colors.sfw),
   });
-  options.add({
+  actions.add({
     label: `Not safe for work coloring`,
     onClick: () => setColorProfile(colors.nsfw),
   });

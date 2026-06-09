@@ -25,7 +25,15 @@ export class List extends Component {
   }
 
   get height() {
-    return this.items.reduce((t, e) => t + e.height, 0);
+    const { items } = this;
+    const bins = {};
+    items.forEach((item) => {
+      bins[item.column] ??= 0;
+      bins[item.column]++;
+    });
+    const values = Object.values(bins);
+    if (values.length === 0) return 0;
+    return max(...values);
   }
 
   async select(startAtEnd = false) {
@@ -85,25 +93,19 @@ export class List extends Component {
   }
 
   async reflow(rows, total) {
-    return;
-
-    const { items, height } = this;
+    const height = this.height;
+    const { items } = this;
     const { length } = items;
 
     const ideal = ceil(rows / total);
 
     // do we even need to reflow?
-    if (height < ideal) {
-      return rows - height;
+    if (height <= ideal) {
+      return 0;
     }
-
-    console.clear();
-    console.log(`we need to reflow`);
-    exit(false);
 
     // for now let's assume we have the entire width availabe: what's a decent cutoff?
     const d = ceil(length / ideal);
-    log(`length: ${length}, rows: ${ideal}, total: ${total}, d: ${d}`);
     const step = (Screen.width / d) | 0;
     for (let s = 0; s < d; s++) {
       const c = s * step;
@@ -115,7 +117,6 @@ export class List extends Component {
       }
     }
 
-    // ...compute new height...
-    return rows - ideal - 2;
+    return height - this.height;
   }
 }
