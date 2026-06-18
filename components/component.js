@@ -12,8 +12,8 @@ export class Component {
 
   constructor(opts = {}) {
     Object.assign(this, Component.default, opts);
-    if (!this.label) {
-      this.label = this.__proto__.constructor.name;
+    if (!this.text) {
+      this.text = this.__proto__.constructor.name;
     }
   }
 

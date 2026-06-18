@@ -7,20 +7,20 @@ export class FilterItem extends CheckboxItem {
     return d;
   })();
 
-  constructor(opts = {}) {
-    super(Object.assign({}, FilterItem.default, opts));
+  constructor(text, opts = {}) {
+    super(text, Object.assign({}, FilterItem.default, opts));
   }
 
   async toggle() {
     this.checked =
       this.checked === true ? false : this.checked === false ? undefined : true;
-    this.onClick?.(this.label, this.checked);
+    this.onClick?.(this.text, this.checked);
     return this.draw();
   }
 
   async draw() {
-    const { checked, label } = this;
-    const content = `[${checked === true ? `+` : checked === false ? `-` : ` `}] ${label}`;
+    const { checked, text } = this;
+    const content = `[${checked === true ? `+` : checked === false ? `-` : ` `}] ${text}`;
     return super.draw(content);
   }
 }

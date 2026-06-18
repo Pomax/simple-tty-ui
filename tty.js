@@ -1,4 +1,6 @@
 import util from "node:util";
+import readline from "node:readline";
+
 import { initColors } from "./managers/color.js";
 import { Screen } from "./managers/screen.js";
 import { emitKeypressEvents } from "node:readline";
@@ -68,23 +70,29 @@ export function enableResize(redraw) {
 }
 
 /**
- * Make sure we cleanly exit, restoring
- * the original colors, the cursor, and
- * input mode.
+ * Revert the TTY to a normal state, restoring
+ * the original colors, the cursor, and input mode.
  */
-export async function exit(clearScreen = true) {
+export async function revert(clearScreen = true) {
   Screen.restore();
   if (clearScreen) await Screen.clear();
   showCursor();
   stdin.setRawMode(false);
   stdin.pause();
+}
+
+/**
+ * Revert and then kill the running process.
+ */
+export async function exit(clearScreen = true) {
+  revert(clearScreen);
   process.exit();
 }
 
 /**
  * Set up TTY handling.
  */
-export async function setup(draw, handleKey) {
+export async function setup(draw, handleKey, handleEsc = true) {
   emitKeypressEvents(stdin);
   initColors(stdout.getColorDepth());
 
@@ -94,13 +102,19 @@ export async function setup(draw, handleKey) {
     stdin.setRawMode(true);
     stdin.on("keypress", (str, key) => {
       if (key && key.ctrl && key.name === "c") {
-        exit();
-      }
-      if (key.name === `escape`) {
-        exit();
+        return exit();
       }
       handleKey(str, key);
     });
+    // This part's kinda bizarre, but Node.js has a 500ms default
+    // timeout between receiving it as data event, and forwarding
+    // it as parsed key event. And quit should be immediate.
+    if (handleEsc) {
+      stdin.on(
+        "data",
+        (data) => data.length === 1 && data[0] === 0x1b && exit(),
+      );
+    }
   }
 
   hideCursor();

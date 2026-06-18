@@ -4,14 +4,14 @@ import { FilterItem } from "./filter-item.js";
 import { Screen } from "../managers/screen.js";
 import { log } from "../file-writer.js";
 import { write, exit } from "../tty.js";
+import { ActionItem } from "./action-item.js";
 
 const { ceil, max } = Math;
 
 export class List extends Component {
-  static Checkbox = CheckboxItem;
-  static Filter = FilterItem;
-
-  static default = {};
+  static default = {
+    resize: true,
+  };
 
   items = [];
 
@@ -79,11 +79,11 @@ export class List extends Component {
     await this.selected?.toggle();
   }
 
-  add(opts) {
+  add(text, opts = {}) {
     const { items, row, column, height, type: ItemType } = this;
     opts.row = row + height;
     opts.column = column + 1;
-    const item = new ItemType(opts);
+    const item = new ItemType(text, opts);
     items.push(item);
     return item;
   }
@@ -92,24 +92,31 @@ export class List extends Component {
     for (const item of this.items) await item.draw();
   }
 
+  /**
+   * ...docs go here...
+   */
   async reflow(rows, total) {
     const height = this.height;
     const { items } = this;
     const { length } = items;
 
-    const ideal = ceil(rows / total);
+    let ideal = ceil(rows / (total + 1));
 
     // do we even need to reflow?
     if (height <= ideal) {
       return 0;
     }
 
-    // for now let's assume we have the entire width availabe: what's a decent cutoff?
+    // for now let's assume we have the entire width availalbe: what's a decent cutoff?
+    const bottom = Screen.rows - Screen.padding;
+    while (ideal > 1 && this.row + ideal >= bottom) ideal--;
+
     const d = ceil(length / ideal);
     const step = (Screen.width / d) | 0;
+
     for (let s = 0; s < d; s++) {
       const c = s * step;
-      for (let r = 0; r <= ideal; r++) {
+      for (let r = 0; r < ideal; r++) {
         const i = items[r + s * ideal];
         if (!i) continue;
         i.row = this.row + r;
@@ -118,5 +125,26 @@ export class List extends Component {
     }
 
     return height - this.height;
+  }
+}
+
+export class ActionList extends List {
+  constructor(name, opts = {}) {
+    opts.name = name;
+    super(ActionItem, opts);
+  }
+}
+
+export class CheckboxList extends List {
+  constructor(name, opts = {}) {
+    opts.name = name;
+    super(CheckboxItem, opts);
+  }
+}
+
+export class FilterList extends List {
+  constructor(name, opts = {}) {
+    opts.name = name;
+    super(FilterItem, opts);
   }
 }

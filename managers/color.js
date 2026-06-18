@@ -145,8 +145,8 @@ class Color8Bit extends Color {
   }
 
   async setColors(fg, bg) {
-    await this.setColor(...fg);
-    await this.setBackground(...bg);
+    await this.setColor(...[fg].flat());
+    await this.setBackground(...[bg].flat());
   }
 
   async setColor(r, g, b) {
@@ -218,13 +218,13 @@ export function initColors(bitDepth) {
   if (bitDepth === 0) {
     throw new Error(`unknown color bit depth`);
   }
-  if (bitDepth === 4) {
+  if (bitDepth === 3) {
+    Colors = new Color3Bit();
+  } else if (bitDepth === 4) {
     Colors = new Color4Bit();
-  }
-  if (bitDepth === 8) {
+  } else if (bitDepth === 8) {
     Colors = new Color8Bit();
-  }
-  if (bitDepth === 24) {
+  } else if (bitDepth === 24) {
     Colors = new Color24Bit();
   }
 }

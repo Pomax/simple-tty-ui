@@ -3,8 +3,8 @@ import { Text } from "./text.js";
 export class ActionItem extends Text {
   static default = {};
 
-  constructor(opts = {}) {
-    super(Object.assign({}, ActionItem.default, opts));
+  constructor(text, opts = {}) {
+    super(text, Object.assign({}, ActionItem.default, opts));
   }
 
   get width() {
@@ -24,7 +24,7 @@ export class ActionItem extends Text {
   }
 
   async draw(content) {
-    content ??= ` ◇  ${this.text ?? this.label}`;
+    content ??= ` ◇  ${this.text}`;
     return super.draw(content);
   }
 }

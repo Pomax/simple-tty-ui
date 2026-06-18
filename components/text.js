@@ -12,7 +12,8 @@ function cleanText(opts) {
 export class Text extends Component {
   static default = {};
 
-  constructor(opts = {}) {
+  constructor(text, opts = {}) {
+    opts.text = text;
     cleanText(opts);
     super(Object.assign({}, Text.default, opts));
   }
