@@ -7,6 +7,17 @@ import { log } from "../file-writer.js";
 export class Page extends Component {
   static default = {};
 
+  static #current;
+
+  static get current() {
+    return this.#current;
+  }
+
+  static set current(page) {
+    this.#current = page;
+    page.reflow();
+  }
+
   items = [];
 
   constructor(opts = {}) {
@@ -89,6 +100,8 @@ export class Page extends Component {
   async draw() {
     const { padding, width, height } = Screen;
     const { items } = this;
+
+    await this.reflow();
 
     if (padding > 0) {
       await this.drawBorder(height, width);

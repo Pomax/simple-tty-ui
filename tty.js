@@ -4,6 +4,7 @@ import readline from "node:readline";
 import { initColors } from "./managers/color.js";
 import { Screen } from "./managers/screen.js";
 import { emitKeypressEvents } from "node:readline";
+import { Page } from "./components/page.js";
 
 const { stdin, stdout } = process;
 
@@ -101,11 +102,23 @@ export async function setup(draw, handleKey, handleEsc = true) {
     // even if we don't show key presses.
     stdin.setRawMode(true);
     stdin.on("keypress", (str, key) => {
-      if (key && key.ctrl && key.name === "c") {
+      const { name, ctrl } = key ?? {};
+
+      if (ctrl && name === "c") {
         return exit();
+      } else if (name === `return` || name === `space`) {
+        Page.current?.toggle?.();
+      } else if (name === `up`) {
+        Page.current?.previous?.();
+      } else if (name === `down`) {
+        Page.current?.next?.();
+      } else if (str === `q`) {
+        exit();
       }
-      handleKey(str, key);
+
+      handleKey?.(str, key);
     });
+
     // This part's kinda bizarre, but Node.js has a 500ms default
     // timeout between receiving it as data event, and forwarding
     // it as parsed key event. And quit should be immediate.

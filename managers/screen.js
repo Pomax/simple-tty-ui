@@ -10,7 +10,7 @@ export const Screen = new (class {
   columns = 0;
   currentRow = 0;
   currentColumn = 0;
-  padding = 0;
+  padding = 1; // border by default
 
   get width() {
     return this.columns;
