@@ -10,6 +10,8 @@ Have a look at the `createMenu` function in the below example for the hopefully 
 
 ## Example
 
+![the demo code](./screenshot.png)
+
 From the `demo.js` file:
 
 ```javascript
@@ -308,12 +310,18 @@ For grayscale, call them with array inputs with gray level 0-23 as first value, 
 
 For "RGB" colors, call them with [r,g,b] arrays. This will use _the nearest cube LUT_ color, which will look approximately like what you thought you were asking for, but will almost certainly not be the _exact_ color you asked for.
 
-#### 24 color
+#### 24 bit color
 
 For exact colors, only 24 bit color terminals will do what you want. You call the functions with [r,g,b] array inputs.
 
 ## This library is still 0.x
 
 It works, it does what I need, but there's still a bunch of code that's "more work than it should be" if you just need some menu pages so the API and default behaviour is still likely to change until I lock this as a v1 and walk away from it because "it just does what it needs to do and will never need to do more than that".
+
+## What's with the node warning?
+
+No idea, it seems to depend on the Node version and the newest Node doesn't show it so... :shrug:?
+
+You can suppress it with `node --no-warnings blah.js` though, for versions that insist on showing it.
 
 - [Pomax](https://mastodon.social/@TheRealPomax)
