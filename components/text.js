@@ -1,6 +1,5 @@
 import { Component } from "./component.js";
 import { Screen } from "../managers/screen.js";
-import { write } from "../tty.js";
 
 const { max } = Math;
 
@@ -34,7 +33,7 @@ export class Text extends Component {
     let lines = 1;
     for (let i = innerWidth; i < text.length; i += innerWidth) {
       i = text.lastIndexOf(` `, i);
-      text = text.slice(0, i) + `\n` + text.slice(i + 1);
+      text = `${text.slice(0, i)}\n${text.slice(i + 1)}`;
       lines++;
     }
     this.text = text;

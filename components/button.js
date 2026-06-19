@@ -25,7 +25,7 @@ export class ButtonGroup extends ItemComponent {
   }
 
   add(text, opts = {}) {
-    const { items, row, column, height } = this;
+    const { items, row, column, } = this;
     const last = items.at(-1);
     opts.row = row;
     opts.column = last ? last.column + last.width + this.spacing : column;

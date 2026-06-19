@@ -1,8 +1,10 @@
 import { Colors } from "../managers/color.js";
 import { Screen } from "../managers/screen.js";
-import { ansi, tty, write, exit } from "../tty.js";
-import { log } from "../file-writer.js";
+import { write } from "../tty.js";
 
+/**
+ * Base component class
+ */
 export class Component {
   static default = {
     row: 1,
@@ -54,11 +56,14 @@ export class Component {
     }
   }
 
-  async reflow(rows, total) {
+  async reflow(_rows, _total) {
     return 0;
   }
 }
 
+/**
+ * Anything that has a list of contained ".items"
+ */
 export class ItemComponent extends Component {
   static default = {
     skipSize: 1,
@@ -73,7 +78,7 @@ export class ItemComponent extends Component {
 
   add() {
     throw new Error(
-      `Missing implementation in ${this.__proto__.constructor.name}`,
+      `Missing implementation for add() in ${this.__proto__.constructor.name}`,
     );
   }
 
@@ -91,7 +96,7 @@ export class ItemComponent extends Component {
   }
 
   async _move_to(pos) {
-    const { items, selected } = this;
+    const { items } = this;
     await this.unselect();
     if (pos < 0 || pos >= items.length) return false;
     this.selected = items[pos];
@@ -117,7 +122,7 @@ export class ItemComponent extends Component {
     const { items, selected } = this;
     const curr = items.indexOf(selected);
     let next = curr + this.skipSize;
-    if (curr !== items.length - 1 && next > items.length)
+    if (curr !== items.length - 1 && next >= items.length)
       next = items.length - 1;
     return this._move_to(next);
   }

@@ -1,5 +1,4 @@
-import { ansi, tty, write } from "../tty.js";
-const { stdin, stdout } = process;
+import { ansi, tty } from "../tty.js";
 
 /**
  * Color management differs depending on the number of
@@ -48,18 +47,18 @@ class Color {
     }
   }
 
-  async setColors(fg, fb) {
+  async setColors(fg, bg) {
     await this.setColor(fg);
     await this.setBackground(bg);
   }
 
-  async setColor(c) {
+  async setColor(_c) {
     throw new Error(
       `setColor is not implemented in ${this.__proto__.constructore.name}`,
     );
   }
 
-  async setBackground(c) {
+  async setBackground(_c) {
     throw new Error(
       `setBackground is not implemented in ${this.__proto__.constructore.name}`,
     );
@@ -100,7 +99,7 @@ class Color3Bit extends Color {
 class Color4Bit extends Color3Bit {
   bits = 4;
 
-  async setColors(fg, fb, bf = false, bb = false) {
+  async setColors(fg, bg, bf = false, bb = false) {
     await this.setColor(fg, bf);
     await this.setBackground(bg, bb);
   }

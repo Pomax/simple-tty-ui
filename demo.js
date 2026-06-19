@@ -1,4 +1,3 @@
-import util from "node:util";
 import { Components, Colors, Screen, exit, setup } from "./index.js";
 const { ActionList, ButtonGroup, CheckboxList, FilterList, Page, Text } =
   Components;
@@ -90,7 +89,7 @@ async function setColorProfile(profile) {
 async function draw(redraw = true) {
   if (!redraw) {
     // If this is our first draw, set up default colors
-    const [text, fg, bg] = colors.default;
+    const [_text, fg, bg] = colors.default;
     await Colors.setColors(fg, bg);
   }
   await Screen.clear();

@@ -1,8 +1,7 @@
 import { ItemComponent } from "./component.js";
 import { Screen } from "../managers/screen.js";
 import { Colors } from "../managers/color.js";
-import { exit, write } from "../tty.js";
-import { log } from "../file-writer.js";
+import { write } from "../tty.js";
 
 export class Page extends ItemComponent {
   static default = {};
@@ -10,11 +9,11 @@ export class Page extends ItemComponent {
   static #current;
 
   static get current() {
-    return this.#current;
+    return Page.#current;
   }
 
   static set current(page) {
-    this.#current = page;
+    Page.#current = page;
     page.reflow();
   }
 
@@ -125,16 +124,17 @@ export class Page extends ItemComponent {
     write(bottomLine);
   }
 
+  /**
+   * Try to fit the content based on positioning constraints
+   */
   async reflow() {
-    // Try to fit the content based on positioning constraints
-
-    const { rows, padding, innerHeight } = Screen;
+    const { padding, innerHeight } = Screen;
     let { resizable, fixed } = getRegions(this);
     const { row, height } = this;
     const lastRow = row + height;
 
     // do we need to reflow this content?
-    if (lastRow + padding > innerHeight) {
+    if (lastRow >= padding + innerHeight) {
       let available = innerHeight - fixed;
       const enumerated = this.items.map((item, i) => ({ item, i }));
       for (const { item, i } of enumerated) {

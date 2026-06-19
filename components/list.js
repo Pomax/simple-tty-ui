@@ -2,8 +2,6 @@ import { ItemComponent } from "./component.js";
 import { CheckboxItem } from "./checkbox-item.js";
 import { FilterItem } from "./filter-item.js";
 import { Screen } from "../managers/screen.js";
-import { log } from "../file-writer.js";
-import { write, exit } from "../tty.js";
 import { ActionItem } from "./action-item.js";
 
 const { ceil, max } = Math;
@@ -47,37 +45,36 @@ export class List extends ItemComponent {
    * ...docs go here...
    */
   async reflow(rows, total) {
-    const height = this.height;
-    const { items } = this;
-    const { length } = items;
+    const { items, column, row } = this;
+    const currentHeight = this.height;
 
+    // Then check if we need to reflow
     let ideal = ceil(rows / (total + 1));
+    if (currentHeight <= ideal) return 0;
 
-    // do we even need to reflow?
-    if (height <= ideal) {
-      return 0;
-    }
-
-    // for now let's assume we have the entire width availalbe: what's a decent cutoff?
-    const bottom = Screen.rows - Screen.padding;
+    // If we do, let's assume we have the entire width available: what's a decent cutoff?
+    const bottom = Screen.padding + Screen.innerHeight;
     while (ideal > 1 && this.row + ideal >= bottom) ideal--;
-
     this.skipSize = ideal;
+    const { skipSize } = this;
 
-    const d = ceil(length / ideal);
+    const { length } = items;
+    const d = ceil(length / skipSize);
     const step = (Screen.width / d) | 0;
 
+    // Then update our item row/column values accordingly
     for (let s = 0; s < d; s++) {
       const c = s * step;
-      for (let r = 0; r < ideal; r++) {
-        const i = items[r + s * ideal];
+      for (let r = 0; r < skipSize; r++) {
+        const i = items[r + s * skipSize];
         if (!i) continue;
-        i.row = this.row + r;
-        i.column = this.column + c;
+        i.row = row + r;
+        i.column = column + c;
       }
     }
 
-    return height - this.height;
+    // then return the difference in height due to reflow
+    return currentHeight - this.height;
   }
 }
 

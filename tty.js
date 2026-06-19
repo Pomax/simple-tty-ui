@@ -1,5 +1,4 @@
 import util from "node:util";
-import readline from "node:readline";
 
 import { initColors } from "./managers/color.js";
 import { Screen } from "./managers/screen.js";
@@ -62,11 +61,15 @@ export function tty(query, question = false, raw = false) {
  * Enable rebinding the terminal's dimensions
  * on a window resize, with a redraw callback
  */
-export function enableResize(redraw) {
+export function enableResize(draw) {
   stdout.on(`resize`, () => {
     const { columns, rows } = process.stdout;
     Object.assign(Screen, { rows, columns });
-    redraw();
+    // BUG: in order for reflow on resize to work properly,
+    //      we need to reset the page components to their\
+    //      original layout, then run reflow
+    Page.current = Page.current;
+    draw();
   });
 }
 

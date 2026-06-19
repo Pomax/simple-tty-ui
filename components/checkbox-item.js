@@ -1,4 +1,4 @@
-import { Screen } from "../managers/screen.js";
+
 import { ActionItem } from "./action-item.js";
 
 export class CheckboxItem extends ActionItem {

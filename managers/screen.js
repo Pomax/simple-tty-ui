@@ -1,6 +1,6 @@
-import { ansi, tty, write } from "../tty.js";
+import { ansi, tty } from "../tty.js";
 
-const { stdin, stdout } = process;
+
 
 /**
  * Screen management object
