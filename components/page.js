@@ -1,10 +1,10 @@
-import { Component } from "./component.js";
+import { ItemComponent } from "./component.js";
 import { Screen } from "../managers/screen.js";
 import { Colors } from "../managers/color.js";
 import { exit, write } from "../tty.js";
 import { log } from "../file-writer.js";
 
-export class Page extends Component {
+export class Page extends ItemComponent {
   static default = {};
 
   static #current;
@@ -17,8 +17,6 @@ export class Page extends Component {
     this.#current = page;
     page.reflow();
   }
-
-  items = [];
 
   constructor(opts = {}) {
     super(Object.assign({}, Page.default, opts));
@@ -36,10 +34,6 @@ export class Page extends Component {
     const len = items.length;
     if (!len) return 0;
     return len - 1 + items.reduce((t, e) => t + e.height, 0);
-  }
-
-  async toggle() {
-    await this.selected?.toggle?.();
   }
 
   async select(startAtEnd = false) {

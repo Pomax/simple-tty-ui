@@ -8,7 +8,8 @@ import {
   setup,
   log as ttyLog,
 } from "./index.js";
-const { ActionList, Button, CheckboxList, FilterList, Page, Text } = Components;
+const { ActionList, ButtonGroup, CheckboxList, FilterList, Page, Text } =
+  Components;
 
 // Some colors, for doing a full menu recolor
 const colors = {
@@ -72,8 +73,12 @@ async function createMenu() {
     ),
   );
 
-  // And a handy little "exit" button.
-  const button = menu.add(new Button(`exit`, { onClick: () => exit() }));
+  // And a handy little button group
+  const buttons = menu.add(new ButtonGroup(`buttons`));
+  buttons.add(`reset`, {
+    onClick: async () => await draw(false),
+  });
+  buttons.add(`exit`, { onClick: () => exit() });
 
   // Then we return this page
   return menu;
