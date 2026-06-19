@@ -41,6 +41,18 @@ export class List extends ItemComponent {
     return item;
   }
 
+  reset() {
+    const original = this.items;
+    this.items = [];
+    this.skipSize = 1;
+    const { row, column, items } = this;
+    for (const item of original) {
+      item.row = row + items.length;
+      item.column = column + 1;
+      items.push(item);
+    }
+  }
+
   /**
    * ...docs go here...
    */
@@ -54,7 +66,7 @@ export class List extends ItemComponent {
 
     // If we do, let's assume we have the entire width available: what's a decent cutoff?
     const bottom = Screen.padding + Screen.innerHeight;
-    while (ideal > 1 && this.row + ideal >= bottom) ideal--;
+    while (ideal > 1 && row + ideal >= bottom) ideal--;
     this.skipSize = ideal;
     const { skipSize } = this;
 

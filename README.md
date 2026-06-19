@@ -114,7 +114,7 @@ async function draw(redraw = true) {
   if (!redraw) {
     // And if this is our first draw, create our
     // menu and then select the first selectable.
-    Page.current = await createMenu();
+    await Page.setCurrentPage(await createMenu());
     await Page.current.select();
   }
   Page.current.draw();

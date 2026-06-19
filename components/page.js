@@ -6,15 +6,13 @@ import { write } from "../tty.js";
 export class Page extends ItemComponent {
   static default = {};
 
-  static #current;
+  static current;
 
-  static get current() {
-    return Page.#current;
-  }
-
-  static set current(page) {
-    Page.#current = page;
-    page.reflow();
+  static async setCurrentPage(page) {
+    Page.current = page;
+    page.reset();
+    await page.reflow();
+    await Page.current.select();
   }
 
   constructor(opts = {}) {
@@ -88,6 +86,14 @@ export class Page extends ItemComponent {
     item.column = this.column;
     items.push(item);
     return item;
+  }
+
+  reset() {
+    const original = this.items;
+    this.items = [];
+    for (const item of original) {
+      this.add(item).reset?.();
+    }
   }
 
   async draw() {

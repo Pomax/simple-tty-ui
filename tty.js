@@ -62,14 +62,11 @@ export function tty(query, question = false, raw = false) {
  * on a window resize, with a redraw callback
  */
 export function enableResize(draw) {
-  stdout.on(`resize`, () => {
+  stdout.on(`resize`, async () => {
     const { columns, rows } = process.stdout;
     Object.assign(Screen, { rows, columns });
-    // BUG: in order for reflow on resize to work properly,
-    //      we need to reset the page components to their\
-    //      original layout, then run reflow
-    Page.current = Page.current;
-    draw();
+    await Page.setCurrentPage(Page.current);
+    await draw();
   });
 }
 
@@ -139,6 +136,6 @@ export async function setup(draw, handleKey, handleEsc = true) {
   }
 
   hideCursor();
-  enableResize(draw);
+  await enableResize(draw);
   await draw(false);
 }
