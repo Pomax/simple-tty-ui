@@ -70,8 +70,10 @@ export class List extends Component {
 
   async skipNext() {
     const { items, selected } = this;
-    let next = items.indexOf(selected) + this.skipSize;
-    if (next > items.length) next = items.length - 1;
+    const curr = items.indexOf(selected);
+    let next = curr + this.skipSize;
+    if (curr !== items.length - 1 && next > items.length)
+      next = items.length - 1;
     return this._move_to(next);
   }
 
@@ -84,8 +86,9 @@ export class List extends Component {
 
   async skipPrevious() {
     const { items, selected } = this;
+    const curr = items.indexOf(selected);
     let prev = items.indexOf(selected) - this.skipSize;
-    if (prev < 0) prev = 0;
+    if (curr !== 0 && prev < 0) prev = 0;
     return this._move_to(prev);
   }
 
