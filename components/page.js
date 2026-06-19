@@ -59,32 +59,32 @@ export class Page extends Component {
     }
   }
 
-  async next() {
+  async next(skip = false) {
     const { items, selected } = this;
     await selected?.unhighlight();
-    const result = await this.selected?.next?.();
+    const result = await this.selected?.next?.(skip);
     if (!result) {
       const idx = items.indexOf(this.selected);
       this.selected = items.at((idx + 1) % items.length);
       if (this.selected?.select) {
         this.selected.select();
       } else {
-        this.next();
+        this.next(skip);
       }
     }
   }
 
-  async previous() {
+  async previous(skip = false) {
     const { items, selected } = this;
     await selected?.unhighlight();
-    const result = await this.selected?.previous?.();
+    const result = await this.selected?.previous?.(skip);
     if (!result) {
       const idx = items.indexOf(this.selected);
       this.selected = items.at(idx - 1);
       if (this.selected?.select) {
         this.selected?.select(true);
       } else {
-        this.previous();
+        this.previous(skip);
       }
     }
   }

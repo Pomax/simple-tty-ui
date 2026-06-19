@@ -11,6 +11,7 @@ const { ceil, max } = Math;
 export class List extends Component {
   static default = {
     resize: true,
+    skipSize: 1,
   };
 
   items = [];
@@ -49,30 +50,43 @@ export class List extends Component {
     this.selected = await this.selected?.unhighlight();
   }
 
-  async next() {
+  async _move_to(pos) {
     const { items, selected } = this;
-    const next = items.indexOf(selected) + 1;
-    await this.selected?.unhighlight();
-    if (next >= items.length) {
-      await this.unselect();
+    await this.unselect();
+    if (pos < 0 || pos >= items.length) {
       return false;
     }
-    this.selected = items[next];
+    this.selected = items[pos];
     await this.selected.highlight();
     return true;
   }
 
-  async previous() {
+  async next(skip = false) {
+    if (skip) return this.skipNext();
+    const { items, selected } = this;
+    const next = items.indexOf(selected) + 1;
+    return this._move_to(next);
+  }
+
+  async skipNext() {
+    const { items, selected } = this;
+    let next = items.indexOf(selected) + this.skipSize;
+    if (next > items.length) next = items.length - 1;
+    return this._move_to(next);
+  }
+
+  async previous(skip = false) {
+    if (skip) return this.skipPrevious();
     const { items, selected } = this;
     const prev = items.indexOf(selected) - 1;
-    await this.selected?.unhighlight();
-    if (prev < 0) {
-      await this.unselect();
-      return false;
-    }
-    this.selected = items[prev];
-    await this.selected?.highlight();
-    return true;
+    return this._move_to(prev);
+  }
+
+  async skipPrevious() {
+    const { items, selected } = this;
+    let prev = items.indexOf(selected) - this.skipSize;
+    if (prev < 0) prev = 0;
+    return this._move_to(prev);
   }
 
   async toggle() {
@@ -110,6 +124,8 @@ export class List extends Component {
     // for now let's assume we have the entire width availalbe: what's a decent cutoff?
     const bottom = Screen.rows - Screen.padding;
     while (ideal > 1 && this.row + ideal >= bottom) ideal--;
+
+    this.skipSize = ideal;
 
     const d = ceil(length / ideal);
     const step = (Screen.width / d) | 0;

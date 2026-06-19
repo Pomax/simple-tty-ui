@@ -103,15 +103,20 @@ export async function setup(draw, handleKey, handleEsc = true) {
     stdin.setRawMode(true);
     stdin.on("keypress", (str, key) => {
       const { name, ctrl } = key ?? {};
+      const { current } = Page;
 
       if (ctrl && name === "c") {
         return exit();
       } else if (name === `return` || name === `space`) {
-        Page.current?.toggle?.();
+        current?.toggle?.();
       } else if (name === `up`) {
-        Page.current?.previous?.();
+        current?.previous?.();
+      } else if (name === `left`) {
+        current?.previous?.(true);
       } else if (name === `down`) {
-        Page.current?.next?.();
+        current?.next?.();
+      } else if (name === `right`) {
+        current?.next?.(true);
       } else if (str === `q`) {
         exit();
       }
