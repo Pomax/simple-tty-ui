@@ -16,16 +16,9 @@ From the `demo.js` file:
 
 ```javascript
 import util from "node:util";
-import {
-  Components,
-  Colors,
-  Screen,
-  exit,
-  revert,
-  setup,
-  log as ttyLog,
-} from "./index.js";
-const { ActionList, Button, CheckboxList, FilterList, Page, Text } = Components;
+import { Components, Colors, Screen, exit, setup } from "./index.js";
+const { ActionList, ButtonGroup, CheckboxList, FilterList, Page, Text } =
+  Components;
 
 // Some colors, for doing a full menu recolor
 const colors = {
@@ -85,12 +78,16 @@ async function createMenu() {
 
   menu.add(
     new Text(
-      `And another paragraph of text, followed by an explicit "exit" button:`,
+      `And another paragraph of text, followed by a "reset" and "exit" button:`,
     ),
   );
 
-  // And a handy little "exit" button.
-  const button = menu.add(new Button(`exit`, { onClick: () => exit() }));
+  // And a handy little button group
+  const buttons = menu.add(new ButtonGroup(`buttons`));
+  buttons.add(`reset`, {
+    onClick: async () => await draw(false),
+  });
+  buttons.add(`exit`, { onClick: () => exit() });
 
   // Then we return this page
   return menu;
@@ -181,9 +178,26 @@ page.add(
 
 This will render as `[some text]` on the screen to make it obvious that it's a button.
 
+### ButtonGroup
+
+A group of buttons all on the same line.
+
+```js
+import { Components } from "simple-tty-ui";
+const { Page, ButtonGroup } = Components;
+const page = new Page("page name");
+const buttons = page.add(new ButtonGroup());
+buttons.add("some text", {
+  onClick: () => doSomething(),
+});
+buttons.add("other text", {
+  onClick: () => doSomethingElse(),
+});
+```
+
 ### ActionList
 
-A list of items that act as buttons.
+A list of items that act list buttons.
 
 ```js
 import { Components } from "simple-tty-ui";
@@ -302,8 +316,8 @@ It works, it does what I need, but there's still a bunch of code that's "more wo
 
 ## What's with the node warning?
 
-No idea, it seems to depend on the Node version and the newest Node doesn't show it so... :shrug:?
+Update to Node 26 or later and you won't get it anymore. You can suppress it on older versions of Node by using `node --no-warnings blah.js`.
 
-You can suppress it with `node --no-warnings blah.js` though, for versions that insist on showing it.
+## Contact
 
-- [Pomax](https://mastodon.social/@TheRealPomax)
+If you find bugs or have ideas, hit up the issue tracker. For everything else, feel free to contact me [on Mastodon](https://mastodon.social/@TheRealPomax).

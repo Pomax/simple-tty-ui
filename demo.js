@@ -1,13 +1,5 @@
 import util from "node:util";
-import {
-  Components,
-  Colors,
-  Screen,
-  exit,
-  revert,
-  setup,
-  log as ttyLog,
-} from "./index.js";
+import { Components, Colors, Screen, exit, setup } from "./index.js";
 const { ActionList, ButtonGroup, CheckboxList, FilterList, Page, Text } =
   Components;
 
@@ -69,7 +61,7 @@ async function createMenu() {
 
   menu.add(
     new Text(
-      `And another paragraph of text, followed by an explicit "exit" button:`,
+      `And another paragraph of text, followed by a "reset" and "exit" button:`,
     ),
   );
 
