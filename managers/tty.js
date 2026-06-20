@@ -1,9 +1,9 @@
 import util from "node:util";
 
-import { initColors } from "./managers/color.js";
-import { Screen } from "./managers/screen.js";
+import { initColors } from "./color.js";
+import { Screen } from "./screen.js";
 import { emitKeypressEvents } from "node:readline";
-import { Page } from "./components/page.js";
+import { Page } from "../components/page.js";
 
 const { stdin, stdout } = process;
 
@@ -65,6 +65,7 @@ export function enableResize(draw) {
   stdout.on(`resize`, async () => {
     const { columns, rows } = process.stdout;
     Object.assign(Screen, { rows, columns });
+    await Page.current.unselect();
     await Page.setCurrentPage(Page.current);
     await draw();
   });

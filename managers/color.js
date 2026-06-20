@@ -1,4 +1,4 @@
-import { ansi, tty } from "../tty.js";
+import { ansi, tty } from "./tty.js";
 
 /**
  * Color management differs depending on the number of

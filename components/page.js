@@ -1,7 +1,7 @@
 import { ItemComponent } from "./component.js";
 import { Screen } from "../managers/screen.js";
 import { Colors } from "../managers/color.js";
-import { write } from "../tty.js";
+import { write } from "../managers/tty.js";
 
 export class Page extends ItemComponent {
   static default = {};

@@ -1,6 +1,6 @@
 import { Colors } from "../managers/color.js";
 import { Screen } from "../managers/screen.js";
-import { write } from "../tty.js";
+import { write } from "../managers/tty.js";
 
 /**
  * Base component class
@@ -54,6 +54,7 @@ export class Component {
       await Screen.setCursor(row + i, column);
       write(line);
     }
+    await Colors.standard();
   }
 
   async reflow(_rows, _total) {
