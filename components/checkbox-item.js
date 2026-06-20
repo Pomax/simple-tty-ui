@@ -11,14 +11,6 @@ export class CheckboxItem extends ActionItem {
     super(text, Object.assign({}, CheckboxItem.default, opts));
   }
 
-  get width() {
-    return this.text.length + 4;
-  }
-
-  get height() {
-    return 1;
-  }
-
   async toggle() {
     this.checked = !this.checked;
     this.onClick?.(this.text, this.checked);
@@ -27,7 +19,7 @@ export class CheckboxItem extends ActionItem {
 
   async draw(content) {
     const { checked, text } = this;
-    content ??= `[${checked ? `x` : ` `}] ${text}`;
+    content ??= ` [${checked ? `x` : ` `}] ${text}`;
     return super.draw(content);
   }
 }
