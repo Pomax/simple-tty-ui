@@ -35,7 +35,7 @@ export class List extends ItemComponent {
   add(text, opts = {}) {
     const { items, row, column, height, type: ItemType } = this;
     opts.row = row + height;
-    opts.column = column + 1;
+    opts.column = column;
     const item = new ItemType(text, opts);
     items.push(item);
     return item;
@@ -48,7 +48,7 @@ export class List extends ItemComponent {
     const { row, column, items } = this;
     for (const item of original) {
       item.row = row + items.length;
-      item.column = column + 1;
+      item.column = column;
       items.push(item);
     }
   }
@@ -57,6 +57,7 @@ export class List extends ItemComponent {
    * ...docs go here...
    */
   async reflow(rows, total) {
+    logToFile(`reflowing ${this.text} with rows=${rows}, total=${total}`);
     const { items, column, row } = this;
     const currentHeight = this.height;
 

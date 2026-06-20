@@ -20,7 +20,7 @@ export class FilterItem extends CheckboxItem {
 
   async draw() {
     const { checked, text } = this;
-    const content = `[${checked === true ? `+` : checked === false ? `-` : ` `}] ${text}`;
+    const content = ` [${checked === true ? `+` : checked === false ? `-` : ` `}] ${text}`;
     return super.draw(content);
   }
 }

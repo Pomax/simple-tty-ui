@@ -138,10 +138,11 @@ export class Page extends ItemComponent {
     let { resizable, fixed } = getRegions(this);
     const { row, height } = this;
     const lastRow = row + height;
+    const spacers = (this.items?.length ?? 1) - 1;
 
     // do we need to reflow this content?
-    if (lastRow >= padding + innerHeight) {
-      let available = innerHeight - fixed;
+    if (lastRow > padding + innerHeight) {
+      let available = innerHeight - fixed - spacers;
       const enumerated = this.items.map((item, i) => ({ item, i }));
       for (const { item, i } of enumerated) {
         if (!item.resize) continue;

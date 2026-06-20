@@ -2,7 +2,7 @@ import { Text } from "./text.js";
 
 export class ActionItem extends Text {
   static default = {
-    widthPadding: 4,
+    widthPadding: 5,
   };
 
   constructor(text, opts = {}) {
@@ -11,6 +11,10 @@ export class ActionItem extends Text {
 
   get width() {
     return super.width + this.widthPadding;
+  }
+
+  get height() {
+    return 1;
   }
 
   async select() {
@@ -26,7 +30,7 @@ export class ActionItem extends Text {
   }
 
   async draw(content) {
-    content ??= ` ◇  ${this.text}`;
+    content ??= `  ◇  ${this.text}`;
     return super.draw(content);
   }
 }
