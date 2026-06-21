@@ -61,7 +61,11 @@ export function tty(query, question = false, raw = false) {
     stdin.once(`data`, (data) => {
       resolve(util.inspect(data.toString()));
     });
-    raw ? write(query) : ansi(query, question);
+    if (raw) {
+      write(query);
+    } else {
+      ansi(query, question);
+    }
   });
 }
 
