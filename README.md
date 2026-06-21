@@ -4,7 +4,7 @@ For when you just need a simple terminal-based way to interact with your Node.js
 
 ## How to install this
 
-Not everything needs a `package.json` file, just download it and unpack. If if you insist on using NPM (which is fair enough, no shade) simply tell npm to install from github using `npm install https://github.com/Pomax/simple-tty-ui`.
+Not everything needs a `package.json` file, just [download it](https://github.com/Pomax/simple-tty-ui/archive/refs/heads/main.zip) and unpack. If if you insist on using NPM (which is fair enough, no shade) simply tell npm to install from github using `npm install https://github.com/Pomax/simple-tty-ui`.
 
 ## How to use this
 
