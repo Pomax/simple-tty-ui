@@ -2,6 +2,10 @@
 
 For when you just need a simple terminal-based way to interact with your Node.js code
 
+## How to install this
+
+Not everything needs a `package.json` file, just download it and unpack. If if you insist on using NPM (which is fair enough, no shade) simply tell npm to install from github using `npm install https://github.com/Pomax/simple-tty-ui`.
+
 ## How to use this
 
 Create a `Page`, and then add stuff to that. Anything you add automatically gets positioned so that there's empty lines between subsequent page elements, and both text elements and lists (action items, checkboxes, and filter options) automatically reflow. Text will auto-wrap if it can't fit on one line, and lists will spread their items over multiple columns if the page would otherwise be too large to fit on the screen.
