@@ -78,9 +78,9 @@ export function enableResize(draw) {
 export async function revert(clearScreen = true) {
   Screen.restore();
   if (clearScreen) await Screen.clear();
-  showCursor();
   stdin.setRawMode(false);
   stdin.pause();
+  showCursor();
 }
 
 /**

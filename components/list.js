@@ -57,7 +57,6 @@ export class List extends ItemComponent {
    * ...docs go here...
    */
   async reflow(rows, total) {
-    logToFile(`reflowing ${this.text} with rows=${rows}, total=${total}`);
     const { items, column, row } = this;
     const currentHeight = this.height;
 

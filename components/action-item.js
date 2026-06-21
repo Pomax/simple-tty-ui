@@ -25,7 +25,8 @@ export class ActionItem extends Text {
     await this.unhighlight();
   }
 
-  toggle() {
+  async toggle() {
+    await this.unselect();
     this.onClick?.(this.text);
   }
 

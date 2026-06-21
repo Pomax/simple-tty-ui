@@ -5,21 +5,36 @@ import { write } from "../managers/tty.js";
 
 export class Page extends ItemComponent {
   static default = {};
-
   static current;
+  static pages = {};
+
+  static reset() {
+    Page.pages = {};
+  }
+
+  static async load(name) {
+    const page = Page.pages[name];
+    console.log(Page.pages);
+    if (!page) return console.warn(`NO`);
+    Screen.clear();
+    await Page.setCurrentPage(page);
+  }
 
   static async setCurrentPage(page) {
     Page.current = page;
     page.reset();
     await page.reflow();
-    await Page.current.select();
+    await page.select();
+    await page.draw();
   }
 
-  constructor(opts = {}) {
+  constructor(name, opts = {}) {
+    opts.name = name;
     super(Object.assign({}, Page.default, opts));
     const { padding } = Screen;
     this.row = 1 + padding;
     this.column = 1 + padding;
+    Page.pages[name] = this;
   }
 
   get width() {
@@ -37,6 +52,7 @@ export class Page extends ItemComponent {
     const { items } = this;
     if (!items.length) return;
     if (startAtEnd) items.reverse();
+    await this.unselect();
     const selected = items.find((e) => e.select);
     if (startAtEnd) items.reverse();
     this.selected = selected;

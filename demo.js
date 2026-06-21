@@ -1,6 +1,13 @@
 import { Components, Colors, Screen, exit, setup } from "./index.js";
-const { ActionList, ButtonGroup, CheckboxList, FilterList, Page, Text } =
-  Components;
+const {
+  ActionList,
+  Button,
+  ButtonGroup,
+  CheckboxList,
+  FilterList,
+  Page,
+  Text,
+} = Components;
 
 // Some colors, for doing a full menu recolor
 const colors = {
@@ -13,7 +20,7 @@ const colors = {
  * Create our first (and currently only) page!
  */
 async function createMenu() {
-  const menu = new Page("main page");
+  const menu = new Page("main menu");
 
   // some general information
   const { bits } = Colors;
@@ -60,19 +67,25 @@ async function createMenu() {
 
   menu.add(
     new Text(
-      `And another paragraph of text, followed by a "reset" and "exit" button:`,
+      `And another paragraph of text, followed by a few action buttons:`,
     ),
   );
 
   // And a handy little button group
   const buttons = menu.add(new ButtonGroup(`buttons`));
-  buttons.add(`reset`, {
-    onClick: async () => await draw(false),
-  });
+  buttons.add(`go to submenu`, { onClick: () => Page.load(`sub menu`) });
+  buttons.add(`reset`, { onClick: () => draw(false) });
   buttons.add(`exit`, { onClick: () => exit() });
+}
 
-  // Then we return this page
-  return menu;
+function createSubMenu() {
+  const page = new Page(`sub menu`);
+  page.add(
+    new Text(
+      `This is a sub menu demonstrator. There's not much here, just a way to get back to the main menu:`,
+    ),
+  );
+  page.add(new Button(`back`, { onClick: () => Page.load(`main menu`) }));
 }
 
 /**
@@ -96,9 +109,12 @@ async function draw(redraw = true) {
   if (!redraw) {
     // And if this is our first draw, create our
     // menu and then select the first selectable.
-    await Page.setCurrentPage(await createMenu());
+    createMenu();
+    createSubMenu();
+    await Page.load(`main menu`);
+  } else {
+    Page.current.draw();
   }
-  Page.current.draw();
 }
 
 // let's start our terminal app
