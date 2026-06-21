@@ -62,7 +62,7 @@ async function createMenu() {
   // An action list, where each option "does something"
   const actions = menu.add(new ActionList(`actions`));
   Object.values(colors).forEach(([text, ...profile]) => {
-    actions.add(text, { onClick: () => setColorProfile(profile) });
+    actions.add(text, { onClick: (btn) => setColorProfile(profile, btn) });
   });
 
   menu.add(
@@ -91,8 +91,9 @@ function createSubMenu() {
 /**
  * Helper function to set global colors.
  */
-async function setColorProfile(profile) {
+async function setColorProfile(profile, component) {
   await Colors.setColors(...profile);
+  await component?.select?.();
   await draw();
 }
 

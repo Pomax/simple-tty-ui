@@ -14,7 +14,7 @@ export class FilterItem extends CheckboxItem {
   async toggle() {
     this.checked =
       this.checked === true ? false : this.checked === false ? undefined : true;
-    this.onClick?.(this.text, this.checked);
+    this.onClick?.(this);
     return this.draw();
   }
 
