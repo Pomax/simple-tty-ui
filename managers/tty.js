@@ -6,8 +6,16 @@ import { emitKeypressEvents } from "node:readline";
 import { Page } from "../components/page.js";
 
 const { stdin, stdout } = process;
-
 export { stdin, stdout };
+
+// Use a keepalive so we only exit via exit()...
+// We need this to deal with process spawns, as
+// we rely on TTY input, which Node does not consider
+// "active code" and so the moment we spawn a process
+// control gets handed over to that process and then
+// when it exits, Node thinks nothing is running.
+// And now your program's gone. So... keepalive.
+setInterval(() => {}, 6000 * 60);
 
 const mark = `\x1b`;
 
@@ -53,7 +61,11 @@ export function tty(query, question = false, raw = false) {
     stdin.once(`data`, (data) => {
       resolve(util.inspect(data.toString()));
     });
-    raw ? write(query) : ansi(query, question);
+    if (raw) {
+      write(query);
+    } else {
+      ansi(query, question);
+    }
   });
 }
 

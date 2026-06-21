@@ -84,9 +84,9 @@ export class ItemComponent extends Component {
   }
 
   async select(startAtEnd = false) {
-    const { items } = this;
+    const { items, skipSize } = this;
     if (!this.selected && items.length) {
-      const selected = items.at(startAtEnd ? -1 : 0);
+      const selected = items.at(startAtEnd ? skipSize > 1 ? skipSize - 1 : -1 : 0);
       this.selected = selected;
       await this.selected?.highlight();
     }
@@ -107,15 +107,23 @@ export class ItemComponent extends Component {
 
   async next(skip = false) {
     if (skip) return this.skipNext();
-    const { items, selected } = this;
+    const { items, selected, skipSize } = this;
     const next = items.indexOf(selected) + 1;
+    if (skipSize > 1 && next % skipSize === 0) {
+      await this.unselect();
+      return false;
+    }
     return this._move_to(next);
   }
 
   async previous(skip = false) {
     if (skip) return this.skipPrevious();
-    const { items, selected } = this;
+    const { items, selected, skipSize } = this;
     const prev = items.indexOf(selected) - 1;
+    if (skipSize > 1 && (prev + 1) % skipSize === 0) {
+      await this.unselect();
+      return false;
+    }
     return this._move_to(prev);
   }
 

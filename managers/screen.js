@@ -37,7 +37,7 @@ export const Screen = new (class {
   }
 
   async setCursorForLogging() {
-    this.setCursor(this.rows - this.padding, this.padding);
+    this.setCursor(this.rows - this.padding, this.padding + 1);
   }
 
   async getCursor() {

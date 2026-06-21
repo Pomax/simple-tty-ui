@@ -14,8 +14,7 @@ export class Page extends ItemComponent {
 
   static async load(name) {
     const page = Page.pages[name];
-    console.log(Page.pages);
-    if (!page) return console.warn(`NO`);
+    if (!page) return;
     Screen.clear();
     await Page.setCurrentPage(page);
   }
