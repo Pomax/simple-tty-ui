@@ -27,7 +27,7 @@ export class ActionItem extends Text {
 
   async toggle() {
     await this.unselect();
-    this.onClick?.(this.text);
+    this.onClick?.(this);
   }
 
   async draw(content) {
