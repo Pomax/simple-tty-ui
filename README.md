@@ -31,7 +31,7 @@ const colors = {
  * Create our first (and currently only) page!
  */
 async function createMenu() {
-  const menu = new Page("main page");
+  const menu = new Page("main menu");
 
   // some general information
   const { bits } = Colors;
@@ -73,31 +73,38 @@ async function createMenu() {
   // An action list, where each option "does something"
   const actions = menu.add(new ActionList(`actions`));
   Object.values(colors).forEach(([text, ...profile]) => {
-    actions.add(text, { onClick: () => setColorProfile(profile) });
+    actions.add(text, { onClick: (btn) => setColorProfile(profile, btn) });
   });
 
   menu.add(
     new Text(
-      `And another paragraph of text, followed by a "reset" and "exit" button:`,
+      `And another paragraph of text, followed by a few action buttons:`,
     ),
   );
 
   // And a handy little button group
   const buttons = menu.add(new ButtonGroup(`buttons`));
-  buttons.add(`reset`, {
-    onClick: async () => await draw(false),
-  });
+  buttons.add(`go to submenu`, { onClick: () => Page.load(`sub menu`) });
+  buttons.add(`reset`, { onClick: () => draw(false) });
   buttons.add(`exit`, { onClick: () => exit() });
+}
 
-  // Then we return this page
-  return menu;
+function createSubMenu() {
+  const page = new Page(`sub menu`);
+  page.add(
+    new Text(
+      `This is a sub menu demonstrator. There's not much here, just a way to get back to the main menu:`,
+    ),
+  );
+  page.add(new Button(`back`, { onClick: () => Page.load(`main menu`) }));
 }
 
 /**
  * Helper function to set global colors.
  */
-async function setColorProfile(profile) {
+async function setColorProfile(profile, component) {
   await Colors.setColors(...profile);
+  await component?.select?.();
   await draw();
 }
 
@@ -107,17 +114,19 @@ async function setColorProfile(profile) {
 async function draw(redraw = true) {
   if (!redraw) {
     // If this is our first draw, set up default colors
-    const [text, fg, bg] = colors.default;
+    const [_text, fg, bg] = colors.default;
     await Colors.setColors(fg, bg);
   }
   await Screen.clear();
   if (!redraw) {
     // And if this is our first draw, create our
     // menu and then select the first selectable.
-    await Page.setCurrentPage(await createMenu());
-    await Page.current.select();
+    createMenu();
+    createSubMenu();
+    await Page.load(`main menu`);
+  } else {
+    Page.current.draw();
   }
-  Page.current.draw();
 }
 
 // let's start our terminal app
