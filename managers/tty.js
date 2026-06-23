@@ -39,7 +39,8 @@ export const write = async (string) => {
 export const log = async (string) => {
   await Screen.setCursorForLogging();
   const { width } = Screen;
-  string = string + ` `.repeat(width - string.length - Screen.padding * 2);
+  string =
+    `LOG: ` + string + ` `.repeat(width - string.length - Screen.padding * 2);
   return write(string);
 };
 
@@ -111,7 +112,7 @@ export async function setup(draw, handleKey, handleEsc = true) {
   initColors(stdout.getColorDepth());
 
   if (process.stdout.isTTY) {
-    process.stdout.write('\x1b[?2004h');
+    process.stdout.write("\x1b[?2004h");
 
     // We want to be able to deal with user input,
     // even if we don't show key presses.

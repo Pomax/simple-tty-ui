@@ -1,4 +1,4 @@
-import { Components, Colors, Screen, exit, setup } from "./index.js";
+import { Components, Colors, Screen, exit, log, setup } from "./index.js";
 const {
   ButtonList,
   Button,
@@ -69,8 +69,12 @@ async function createMenu() {
   menu.add(new Text(`Then an input field:`));
 
   menu.add(
-    new InputField(`Fill in some text`, ({ userInput }) => {
-      // this will fire when the user hits enter, or leaves the element
+    new InputField(`Fill in some text`, {
+      minWidth: 20,
+      emptyChar: `_`,
+      onToggle: ({ userInput }) => {
+        log(`user filled in: "${userInput}"`);
+      },
     }),
   );
 

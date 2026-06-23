@@ -1,15 +1,24 @@
 import { Screen } from "../managers/screen.js";
 import { Text } from "./text.js";
 
+const { max } = Math;
+
 export class InputField extends Text {
   static default = {
     userInput: ``,
+    minWidth: 0,
+    emptyChar: `_`,
   };
 
   cursor = 0;
+  #updated = false;
 
   constructor(text, onToggle, opts = {}) {
-    opts.onToggle ??= onToggle;
+    if (typeof onToggle !== `function`) {
+      opts = onToggle;
+    } else {
+      opts.onToggle ??= onToggle;
+    }
     super(text, Object.assign({}, InputField.default, opts));
   }
 
@@ -31,7 +40,10 @@ export class InputField extends Text {
   }
 
   async toggle() {
-    this.onToggle?.(this);
+    if (this.#updated) {
+      this.onToggle?.(this);
+      this.#updated = false;
+    }
   }
 
   async handleKey(str, key) {
@@ -54,6 +66,7 @@ export class InputField extends Text {
     }
 
     if (this.userInput !== original) {
+      this.#updated = true;
       // This is a silly hack to prevent Node's async paste-as-individual-letters
       // handling from clobbering the redraw.
       if (this.__timeout) clearTimeout(this.__timeout);
@@ -62,7 +75,11 @@ export class InputField extends Text {
   }
 
   async draw() {
-    let content = `  ${this.text}: [${this.userInput}]`;
+    let content = this.userInput;
+    if (content.length < this.minWidth) {
+      content += this.emptyChar.repeat(this.minWidth - this.userInput.length);
+    }
+    content = `  ${this.text}: [${content}]`;
     let padding = Screen.innerWidth - content.length;
     content += ` `.repeat(padding);
     return super.draw(content);
