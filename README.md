@@ -1,16 +1,38 @@
 # A Simple TTY UI library
 
-For when you just need a simple terminal-based way to interact with your Node.js code
+For when you just need a simple terminal-based UI frontend for Node.js code.
 
 ## How to install this
 
-Not everything needs a `package.json` file, just [download it](https://github.com/Pomax/simple-tty-ui/archive/refs/heads/main.zip) and unpack. If if you insist on using NPM (which is fair enough, no shade) simply tell npm to install from github using `npm install https://github.com/Pomax/simple-tty-ui`.
+Not everything needs a `package.json` file, so just [download it](https://github.com/Pomax/simple-tty-ui/archive/refs/heads/main.zip) and unpack. And as a bonus, there's no auto-update mechanism to change what you downloaded into something else that logs your passwords and runs crypto mining on your GPU.
+
+Of course, if if you insist on using NPM (which is fair enough, no shade) simply tell npm to install from github using `npm install https://github.com/Pomax/simple-tty-ui`, though I'd recommend having a look at what the current master commit hash is first, and then pinning it to that instead of course. Again: why would you want to auto-version-update something as simple as this?
 
 ## How to use this
 
-Create a `Page`, and then add stuff to that. Anything you add automatically gets positioned so that there's empty lines between subsequent page elements, and both text elements and lists (action items, checkboxes, and filter options) automatically reflow. Text will auto-wrap if it can't fit on one line, and lists will spread their items over multiple columns if the page would otherwise be too large to fit on the screen.
+### Creating pages
 
-Have a look at the `createMenu` function in the below example for the hopefully obvious syntax, or the "api" section after that for the more boring details.
+This UI library (lol) models your front end as one or more `Page`s, which consist of either:
+
+1. `Text` elements, which are plain inert text that auto-wrap based on terminal width, or
+1. `Button` elements, which can be selected and "do something" when the user presses space or enter.
+
+For convenience, there are a bunch of different ways to present buttons to the user:
+
+1. There's the `ButtonGroup` for putting multiple buttons on the same line, and
+1. there are three types of lists for presenting rows of list items:
+   1. `ButtonList` gives you a list with unary actions: toggle them, do a thing,
+   1. `CheckboxList` gives you the standard binary action: toggle them and then do something with either a true or false state, and
+   1. `FilterList` gives you the standard ternary action: toggle them and do something with true, false, or undefined as state.
+
+That last one is particularly useful for UI that presents the user with overlapping options (e.g. "select all things matching X but not Y").
+
+### Reading out UI state
+
+There are two ways of monitoring UI state:
+
+1. All buttons trigger an `onToggle(button)` when toggled, which lets you do something the moment the user changes your UI state. The `button` argument will have a `.text` property as well as a `.checked` property that can be either `undefined` (button and filter), `true` (checkbox and filter), or `false` (checkbox and filter).
+2. `Page` instances have a `getState` which gives you a full state representation in the form of a standard JS object that you can walk through either using `Object.entries` or `JSON.stringify` with an inspection function as "replacer".
 
 ## Example
 
@@ -21,7 +43,7 @@ From the `demo.js` file:
 ```javascript
 import util from "node:util";
 import { Components, Colors, Screen, exit, setup } from "./index.js";
-const { ActionList, ButtonGroup, CheckboxList, FilterList, Page, Text } =
+const { ButtonList, ButtonGroup, CheckboxList, FilterList, Page, Text } =
   Components;
 
 // Some colors, for doing a full menu recolor
@@ -75,9 +97,9 @@ async function createMenu() {
   );
 
   // An action list, where each option "does something"
-  const actions = menu.add(new ActionList(`actions`));
+  const actions = menu.add(new ButtonList(`actions`));
   Object.values(colors).forEach(([text, ...profile]) => {
-    actions.add(text, { onClick: (btn) => setColorProfile(profile, btn) });
+    actions.add(text, { onToggle: (btn) => setColorProfile(profile, btn) });
   });
 
   menu.add(
@@ -88,9 +110,9 @@ async function createMenu() {
 
   // And a handy little button group
   const buttons = menu.add(new ButtonGroup(`buttons`));
-  buttons.add(`go to submenu`, { onClick: () => Page.load(`sub menu`) });
-  buttons.add(`reset`, { onClick: () => draw(false) });
-  buttons.add(`exit`, { onClick: () => exit() });
+  buttons.add(`go to submenu`, { onToggle: () => Page.load(`sub menu`) });
+  buttons.add(`reset`, { onToggle: () => draw(false) });
+  buttons.add(`exit`, { onToggle: () => exit() });
 }
 
 function createSubMenu() {
@@ -100,7 +122,7 @@ function createSubMenu() {
       `This is a sub menu demonstrator. There's not much here, just a way to get back to the main menu:`,
     ),
   );
-  page.add(new Button(`back`, { onClick: () => Page.load(`main menu`) }));
+  page.add(new Button(`back`, { onToggle: () => Page.load(`main menu`) }));
 }
 
 /**
@@ -184,7 +206,7 @@ const { Page, Button } = Components;
 const page = new Page("page name");
 page.add(
   new Button("some text", {
-    onClick: () => doSomething(),
+    onToggle: () => doSomething(),
   }),
 );
 ```
@@ -201,27 +223,27 @@ const { Page, ButtonGroup } = Components;
 const page = new Page("page name");
 const buttons = page.add(new ButtonGroup());
 buttons.add("some text", {
-  onClick: () => doSomething(),
+  onToggle: () => doSomething(),
 });
 buttons.add("other text", {
-  onClick: () => doSomethingElse(),
+  onToggle: () => doSomethingElse(),
 });
 ```
 
-### ActionList
+### ButtonList
 
 A list of items that act list buttons.
 
 ```js
 import { Components } from "simple-tty-ui";
-const { Page, ActionList } = Components;
+const { Page, ButtonList } = Components;
 const page = new Page("page name");
-const actions = page.add(new ActionList("list name here"));
+const actions = page.add(new ButtonList("list name here"));
 actions.add(`Do a thing`, {
-  onClick: (name) => doAThing(name),
+  onToggle: (name) => doAThing(name),
 });
 actions.add(`Do another thing`, {
-  onClick: (name) => doAnotherThing(name),
+  onToggle: (name) => doAnotherThing(name),
 });
 ```
 
@@ -237,14 +259,14 @@ const { Page, CheckboxList } = Components;
 const page = new Page("page name");
 const options = page.add(new CheckboxList("list name here"));
 function handleOption(name, value) { ... }
-options.add(`Do a thing`, { checked: true, onClick: handleOption });
-options.add(`Do another thing`, { onClick: handleOption });
+options.add(`Do a thing`, { checked: true, onToggle: handleOption });
+options.add(`Do another thing`, { onToggle: handleOption });
 ```
 
 Chechbox items have a name and optional object with:
 
 - `checked: bool`, the initial "checked or not" state. defaults to false.
-- `onClick`, a handle for when this option changes state, with `(name, value)` signature.
+- `onToggle`, a handle for when this option changes state, with `(name, value)` signature.
 
 ### FilterList
 
@@ -256,9 +278,9 @@ const { Page, FilterList } = Components;
 const page = new Page("page name");
 const options = page.add(new FilterList("list name here"));
 function updateContent(name, value) { ... }
-options.add(`Some tag`, { checked: true, onClick: updateContent });
-options.add(`Some other tag`, { checked: false, onClick: updateContent });
-options.add(`And a third one`, { onClick: updateContent });
+options.add(`Some tag`, { checked: true, onToggle: updateContent });
+options.add(`Some other tag`, { checked: false, onToggle: updateContent });
+options.add(`And a third one`, { onToggle: updateContent });
 ```
 
 Filter items behave the same as checkbox items, except their `checked` property has three possible values, `true` for positive, `false` for negative, and `undefined ` (the default) for neither.

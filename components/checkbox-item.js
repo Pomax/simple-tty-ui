@@ -13,7 +13,7 @@ export class CheckboxItem extends ActionItem {
 
   async toggle() {
     this.checked = !this.checked;
-    this.onClick?.(this);
+    this.onToggle?.(this);
     return this.draw();
   }
 

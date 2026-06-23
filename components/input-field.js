@@ -1,0 +1,70 @@
+import { Screen } from "../managers/screen.js";
+import { Text } from "./text.js";
+
+export class InputField extends Text {
+  static default = {
+    userInput: ``,
+  };
+
+  cursor = 0;
+
+  constructor(text, onToggle, opts = {}) {
+    opts.onToggle ??= onToggle;
+    super(text, Object.assign({}, InputField.default, opts));
+  }
+
+  get width() {
+    return 2 + super.width + 4 + this.userInput;
+  }
+
+  async select() {
+    this.highlight();
+  }
+
+  async unselect() {
+    this.unhighlight();
+  }
+
+  async unhighlight() {
+    await this.toggle();
+    return super.unhighlight();
+  }
+
+  async toggle() {
+    this.onToggle?.(this);
+  }
+
+  async handleKey(str, key) {
+    const { cursor, userInput } = this;
+    const original = `${userInput}`;
+
+    if (key.name === `return`) {
+      return this.toggle();
+    } else if (key.name === `backspace`) {
+      if (cursor > 0) {
+        this.userInput =
+          userInput.slice(0, cursor - 1) + userInput.slice(cursor);
+        this.cursor--;
+      }
+    } else if (key.name === `delete` && cursor < userInput.length) {
+      this.userInput = userInput.slice(0, cursor) + userInput.slice(cursor + 1);
+    } else if (str) {
+      this.userInput += str;
+      this.cursor += str.length;
+    }
+
+    if (this.userInput !== original) {
+      // This is a silly hack to prevent Node's async paste-as-individual-letters
+      // handling from clobbering the redraw.
+      if (this.__timeout) clearTimeout(this.__timeout);
+      this.__timeout = setTimeout(() => this.draw(), 10);
+    }
+  }
+
+  async draw() {
+    let content = `  ${this.text}: [${this.userInput}]`;
+    let padding = Screen.innerWidth - content.length;
+    content += ` `.repeat(padding);
+    return super.draw(content);
+  }
+}

@@ -90,9 +90,14 @@ export class List extends ItemComponent {
   }
 }
 
-export class ActionList extends List {
+export class ButtonList extends List {
   constructor(name, opts = {}) {
     super(name, ActionItem, opts);
+  }
+
+  add(text, onToggle, opts = {}) {
+    opts.onToggle ??= onToggle;
+    return super.add(text, opts);
   }
 }
 
