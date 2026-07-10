@@ -196,6 +196,31 @@ const page = new Page("page name");
 page.add(new Text("some text"));
 ```
 
+### InputField
+
+It's text, but you get to write it!
+
+```js
+import { Components } from "simple-tty-ui";
+const { Page, Text } = Components;
+const page = new Page("page name");
+page.add(
+  new InputField(`Fill in some text`, {
+    minWidth: 20,
+    emptyChar: `_`,
+    onToggle: ({ userInput }) => {
+      log(`user filled in: "${userInput}"`);
+    },
+  }),
+);
+```
+
+Input fields have a label and optional object with:
+
+- `minWidth: number`, the minimum character width to show as field placeholder. Defaults to zero.
+- `emptyChar: string`, the character to use for empty space. Defaults to an underscore.
+- `onToggle`, a handler for when this option changes state, with `(thisInputField)` as call argument.
+
 ### Button
 
 Like text, but it can do something!
@@ -266,7 +291,8 @@ options.add(`Do another thing`, { onToggle: handleOption });
 Chechbox items have a name and optional object with:
 
 - `checked: bool`, the initial "checked or not" state. defaults to false.
-- `onToggle`, a handle for when this option changes state, with `(name, value)` signature.
+- `onToggle`, a handler for when this option changes state, with `(thisCheckboxItem)` as call argument.
+
 
 ### FilterList
 
