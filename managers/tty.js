@@ -93,7 +93,7 @@ export async function revert(clearScreen = true) {
   if (clearScreen) await Screen.clear();
   stdin.setRawMode(false);
   stdin.pause();
-  showCursor();
+  await showCursor();
 }
 
 /**

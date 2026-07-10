@@ -1,3 +1,4 @@
+import { writeFileSync } from "node:fs";
 import { Components, Colors, Screen, exit, log, setup } from "./index.js";
 const {
   ButtonList,
@@ -5,7 +6,7 @@ const {
   ButtonGroup,
   CheckboxList,
   FilterList,
-  InputField,
+  Input,
   Page,
   Text,
 } = Components;
@@ -69,7 +70,7 @@ async function createMenu() {
   menu.add(new Text(`Then an input field:`));
 
   menu.add(
-    new InputField(`Fill in some text`, {
+    new Input(`Fill in some text`, {
       minWidth: 20,
       emptyChar: `_`,
       onToggle: ({ userInput }) => {
@@ -88,7 +89,12 @@ async function createMenu() {
   const buttons = menu.add(new ButtonGroup(`buttons`));
   buttons.add(`go to submenu`, () => Page.load(`sub menu`));
   buttons.add(`reset`, () => draw(false));
-  buttons.add(`exit`, () => exit());
+  buttons.add(`exit`, () => {
+    const { state } = Page;
+    const stateString = JSON.stringify(state, null, 2);
+    writeFileSync(`state-on-exit.log`, stateString);
+    exit();
+  });
 }
 
 function createSubMenu() {

@@ -15,9 +15,11 @@ export class Component {
 
   constructor(opts = {}) {
     Object.assign(this, Component.default, opts);
-    if (!this.text) {
-      this.text = this.__proto__.constructor.name;
-    }
+    this.text ??= this.name ?? this.__proto__.constructor.name;
+  }
+
+  get state() {
+    return {};
   }
 
   get width() {
@@ -83,10 +85,20 @@ export class ItemComponent extends Component {
     );
   }
 
+  get state() {
+    return this.items.reduce((acc, item) => {
+      const { stateful, text, state } = item;
+      if (stateful) acc[text] = state;
+      return acc;
+    }, {});
+  }
+
   async select(startAtEnd = false) {
     const { items, skipSize } = this;
     if (!this.selected && items.length) {
-      const selected = items.at(startAtEnd ? skipSize > 1 ? skipSize - 1 : -1 : 0);
+      const selected = items.at(
+        startAtEnd ? (skipSize > 1 ? skipSize - 1 : -1) : 0,
+      );
       this.selected = selected;
       await this.selected?.highlight();
     }
@@ -131,8 +143,7 @@ export class ItemComponent extends Component {
     const { items, selected } = this;
     const curr = items.indexOf(selected);
     let next = curr + this.skipSize;
-    if (next >= items.length)
-      next = next % items.length;
+    if (next >= items.length) next = next % items.length;
     return this._move_to(next);
   }
 

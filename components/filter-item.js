@@ -2,7 +2,7 @@ import { CheckboxItem } from "./checkbox-item.js";
 
 export class FilterItem extends CheckboxItem {
   static default = (() => {
-    const d = CheckboxItem.default;
+    const d = Object.assign({}, CheckboxItem.default);
     d.checked = undefined;
     return d;
   })();

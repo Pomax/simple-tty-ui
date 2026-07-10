@@ -3,7 +3,7 @@ import { Text } from "./text.js";
 
 const { max } = Math;
 
-export class InputField extends Text {
+export class Input extends Text {
   static default = {
     userInput: ``,
     minWidth: 0,
@@ -19,7 +19,13 @@ export class InputField extends Text {
     } else {
       opts.onToggle ??= onToggle;
     }
-    super(text, Object.assign({}, InputField.default, opts));
+    super(text, Object.assign({}, Input.default, opts));
+    this.stateful = true;
+  }
+
+  get state() {
+    const { userInput } = this;
+    return { userInput };
   }
 
   get width() {

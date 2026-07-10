@@ -8,6 +8,15 @@ export class Page extends ItemComponent {
   static current;
   static pages = {};
 
+  static get state() {
+    const pages = Object.values(Page.pages);
+    return pages.reduce((acc, page) => {
+      const { name, state } = page;
+      acc[name] = state;
+      return acc;
+    }, {});
+  }
+
   static reset() {
     Page.pages = {};
   }
@@ -15,11 +24,11 @@ export class Page extends ItemComponent {
   static async load(name) {
     const page = Page.pages[name];
     if (!page) return;
-    Screen.clear();
     await Page.setCurrentPage(page);
   }
 
   static async setCurrentPage(page) {
+    await Screen.clear();
     Page.current = page;
     page.reset();
     await page.reflow();
@@ -28,9 +37,9 @@ export class Page extends ItemComponent {
   }
 
   constructor(name, opts = {}) {
-    opts.name = name;
-    super(Object.assign({}, Page.default, opts));
+    super(name, Object.assign({}, Page.default, opts));
     const { padding } = Screen;
+    this.stateful = true;
     this.row = 1 + padding;
     this.column = 1 + padding;
     Page.pages[name] = this;

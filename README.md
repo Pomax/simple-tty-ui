@@ -187,6 +187,22 @@ const page = new Page("page name");
 - `.next()` select whichever selectable element follows the current on. This behaviour wraps.
 - `.add(item)` add an item to this page. returns the added item for convenience.
 
+#### Static `Page` properties
+
+The `Page` class is special in that it tracks all pages in your menu system, and so has some static properties and methods:
+
+##### properties
+
+- `.state` an object representation of the full state of your menu system. Note that this only includes "stateful" content like checkboxes and input fields, not plain content like text or buttons.
+- `.current` the currently active page.
+- `.pages` the object that tracks all pages, with the shape `{ [page.name]: page }`.
+
+##### methods
+
+- `.reset` clears out any pages that were defined up to that point, returning the state of your page collection before resetting.
+- `.load(pagename: string)` loads a specific page as the active page that the users sees.
+- `.setCurrentPage(page)` while it is advisable to just use `load`, if you already have a `page` instance you can directly switch to that using this function.
+
 ### Text
 
 ```js
@@ -196,7 +212,7 @@ const page = new Page("page name");
 page.add(new Text("some text"));
 ```
 
-### InputField
+### Input
 
 It's text, but you get to write it!
 
@@ -205,7 +221,7 @@ import { Components } from "simple-tty-ui";
 const { Page, Text } = Components;
 const page = new Page("page name");
 page.add(
-  new InputField(`Fill in some text`, {
+  new Input(`Fill in some text`, {
     minWidth: 20,
     emptyChar: `_`,
     onToggle: ({ userInput }) => {
@@ -219,7 +235,7 @@ Input fields have a label and optional object with:
 
 - `minWidth: number`, the minimum character width to show as field placeholder. Defaults to zero.
 - `emptyChar: string`, the character to use for empty space. Defaults to an underscore.
-- `onToggle`, a handler for when this option changes state, with `(thisInputField)` as call argument.
+- `onToggle`, a handler for when this option changes state, with `(thisInput)` as call argument.
 
 ### Button
 
@@ -292,7 +308,6 @@ Chechbox items have a name and optional object with:
 
 - `checked: bool`, the initial "checked or not" state. defaults to false.
 - `onToggle`, a handler for when this option changes state, with `(thisCheckboxItem)` as call argument.
-
 
 ### FilterList
 

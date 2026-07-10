@@ -104,11 +104,13 @@ export class ButtonList extends List {
 export class CheckboxList extends List {
   constructor(name, opts = {}) {
     super(name, CheckboxItem, opts);
+    this.stateful = true;
   }
 }
 
 export class FilterList extends List {
   constructor(name, opts = {}) {
     super(name, FilterItem, opts);
+    this.stateful = true;
   }
 }

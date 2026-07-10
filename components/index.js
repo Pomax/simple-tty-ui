@@ -2,7 +2,7 @@ import { ActionItem } from "./action-item.js";
 import { Button, ButtonGroup } from "./button.js";
 import { CheckboxItem } from "./checkbox-item.js";
 import { FilterItem } from "./filter-item.js";
-import { InputField } from "./input-field.js";
+import { Input } from "./input.js";
 import { List, ButtonList, CheckboxList, FilterList } from "./list.js";
 import { Page } from "./page.js";
 import { Text } from "./text.js";
@@ -16,7 +16,7 @@ export {
   CheckboxList,
   FilterItem,
   FilterList,
-  InputField,
+  Input,
   List,
   Page,
   Text,
