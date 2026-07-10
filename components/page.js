@@ -18,7 +18,9 @@ export class Page extends ItemComponent {
   }
 
   static reset() {
+    const state = this.state;
     Page.pages = {};
+    return state;
   }
 
   static async load(name) {
