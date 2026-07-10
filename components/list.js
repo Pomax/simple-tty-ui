@@ -32,8 +32,13 @@ export class List extends ItemComponent {
     return max(...values);
   }
 
-  add(text, opts = {}) {
+  add(text, onToggle, opts = {}) {
     const { items, row, column, height, type: ItemType } = this;
+    if (typeof onToggle === `object`) {
+      opts = onToggle;
+    } else {
+      opts.onToggle ??= onToggle;
+    }
     opts.row = row + height;
     opts.column = column;
     const item = new ItemType(text, opts);
@@ -93,11 +98,6 @@ export class List extends ItemComponent {
 export class ButtonList extends List {
   constructor(name, opts = {}) {
     super(name, ActionItem, opts);
-  }
-
-  add(text, onToggle, opts = {}) {
-    opts.onToggle ??= onToggle;
-    return super.add(text, opts);
   }
 }
 

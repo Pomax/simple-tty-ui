@@ -10,7 +10,11 @@ export class Button extends ActionItem {
   };
 
   constructor(text, onToggle, opts = {}) {
-    opts.onToggle ??= onToggle;
+    if (typeof onToggle === `object`) {
+      opts = onToggle;
+    } else {
+      opts.onToggle ??= onToggle;
+    }
     super(text, Object.assign({}, Button.default, opts));
   }
 

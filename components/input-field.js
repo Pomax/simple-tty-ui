@@ -14,7 +14,7 @@ export class InputField extends Text {
   #updated = false;
 
   constructor(text, onToggle, opts = {}) {
-    if (typeof onToggle !== `function`) {
+    if (typeof onToggle === `object`) {
       opts = onToggle;
     } else {
       opts.onToggle ??= onToggle;
