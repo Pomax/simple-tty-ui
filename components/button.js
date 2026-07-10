@@ -9,7 +9,12 @@ export class Button extends ActionItem {
     widthPadding: 2,
   };
 
-  constructor(text, opts = {}) {
+  constructor(text, onToggle, opts = {}) {
+    if (typeof onToggle === `object`) {
+      opts = onToggle;
+    } else {
+      opts.onToggle ??= onToggle;
+    }
     super(text, Object.assign({}, Button.default, opts));
   }
 
@@ -30,12 +35,12 @@ export class ButtonGroup extends ItemComponent {
     super(name, Object.assign({}, ButtonGroup.default, opts));
   }
 
-  add(text, opts = {}) {
+  add(text, onToggle, opts = {}) {
     const { items, row, column } = this;
     const last = items.at(-1);
     opts.row = row;
     opts.column = last ? last.column + last.width + this.spacing : column;
-    const item = new Button(text, opts);
+    const item = new Button(text, onToggle, opts);
     items.push(item);
     return item;
   }

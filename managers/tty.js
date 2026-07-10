@@ -39,7 +39,8 @@ export const write = async (string) => {
 export const log = async (string) => {
   await Screen.setCursorForLogging();
   const { width } = Screen;
-  string = string + ` `.repeat(width - string.length - Screen.padding * 2);
+  string =
+    `LOG: ` + string + ` `.repeat(width - string.length - Screen.padding * 2);
   return write(string);
 };
 
@@ -111,30 +112,34 @@ export async function setup(draw, handleKey, handleEsc = true) {
   initColors(stdout.getColorDepth());
 
   if (process.stdout.isTTY) {
+    process.stdout.write("\x1b[?2004h");
+
     // We want to be able to deal with user input,
     // even if we don't show key presses.
     stdin.setRawMode(true);
-    stdin.on("keypress", (str, key) => {
-      const { name, ctrl } = key ?? {};
+    stdin.on("keypress", async (str, key) => {
+      const { sequence, name, ctrl } = key ?? {};
       const { current } = Page;
 
       if (ctrl && name === "c") {
         return exit();
-      } else if (name === `return` || name === `space`) {
-        current?.toggle?.();
       } else if (name === `up`) {
         current?.previous?.();
-      } else if (name === `left`) {
-        current?.previous?.(true);
       } else if (name === `down`) {
         current?.next?.();
+      } else if (current?.selected?.handleKey) {
+        await current.selected.handleKey(str, key);
+      } else if (name === `left`) {
+        current?.previous?.(true);
       } else if (name === `right`) {
         current?.next?.(true);
       } else if (str === `q`) {
         exit();
+      } else if (name === `return` || name === `space`) {
+        current?.toggle?.();
       }
 
-      handleKey?.(str, key);
+      await handleKey?.(str, key);
     });
 
     // This part's kinda bizarre, but Node.js has a 500ms default
@@ -146,6 +151,12 @@ export async function setup(draw, handleKey, handleEsc = true) {
         (data) => data.length === 1 && data[0] === 0x1b && exit(),
       );
     }
+
+    // TODO: this should just be a pure `data` handler without relying
+    //       on Node's emitKeypressEvents because it's fucking useless
+    //       for things like pasting text, instead sending the paste as
+    //       individual letters in raw mode, without any flag that says
+    //       it was part of a paste action.
   }
 
   hideCursor();

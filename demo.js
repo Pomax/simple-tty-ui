@@ -1,10 +1,11 @@
-import { Components, Colors, Screen, exit, setup } from "./index.js";
+import { Components, Colors, Screen, exit, log, setup } from "./index.js";
 const {
-  ActionList,
+  ButtonList,
   Button,
   ButtonGroup,
   CheckboxList,
   FilterList,
+  InputField,
   Page,
   Text,
 } = Components;
@@ -60,10 +61,22 @@ async function createMenu() {
   );
 
   // An action list, where each option "does something"
-  const actions = menu.add(new ActionList(`actions`));
+  const actions = menu.add(new ButtonList(`actions`));
   Object.values(colors).forEach(([text, ...profile]) => {
-    actions.add(text, { onClick: (btn) => setColorProfile(profile, btn) });
+    actions.add(text, (btn) => setColorProfile(profile, btn));
   });
+
+  menu.add(new Text(`Then an input field:`));
+
+  menu.add(
+    new InputField(`Fill in some text`, {
+      minWidth: 20,
+      emptyChar: `_`,
+      onToggle: ({ userInput }) => {
+        log(`user filled in: "${userInput}"`);
+      },
+    }),
+  );
 
   menu.add(
     new Text(
@@ -73,9 +86,9 @@ async function createMenu() {
 
   // And a handy little button group
   const buttons = menu.add(new ButtonGroup(`buttons`));
-  buttons.add(`go to submenu`, { onClick: () => Page.load(`sub menu`) });
-  buttons.add(`reset`, { onClick: () => draw(false) });
-  buttons.add(`exit`, { onClick: () => exit() });
+  buttons.add(`go to submenu`, () => Page.load(`sub menu`));
+  buttons.add(`reset`, () => draw(false));
+  buttons.add(`exit`, () => exit());
 }
 
 function createSubMenu() {
@@ -85,7 +98,7 @@ function createSubMenu() {
       `This is a sub menu demonstrator. There's not much here, just a way to get back to the main menu:`,
     ),
   );
-  page.add(new Button(`back`, { onClick: () => Page.load(`main menu`) }));
+  page.add(new Button(`back`, { onToggle: () => Page.load(`main menu`) }));
 }
 
 /**
