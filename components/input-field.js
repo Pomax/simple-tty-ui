@@ -7,14 +7,14 @@ export class InputField extends Text {
   static default = {
     userInput: ``,
     minWidth: 0,
-    emptyChar: `_`,
+    emptyChar: ` `,
   };
 
   cursor = 0;
   #updated = false;
 
   constructor(text, onToggle, opts = {}) {
-    if (typeof onToggle !== `function`) {
+    if (typeof onToggle === `object`) {
       opts = onToggle;
     } else {
       opts.onToggle ??= onToggle;
@@ -24,6 +24,14 @@ export class InputField extends Text {
 
   get width() {
     return 2 + super.width + 4 + this.userInput;
+  }
+
+  get values() {
+    const { text, userInput } = this;
+    return {
+      name: text,
+      value: userInput,
+    };
   }
 
   async select() {

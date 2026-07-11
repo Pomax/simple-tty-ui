@@ -28,6 +28,10 @@ export class Component {
     return 0;
   }
 
+  get values() {
+    return false;
+  }
+
   move(rows = 0, columns = 0) {
     if (!rows && !columns) return;
     this.row += rows;

@@ -7,15 +7,26 @@ import { ActionItem } from "./action-item.js";
 export class Button extends ActionItem {
   static default = {
     widthPadding: 2,
+    padding: 0,
   };
 
   constructor(text, onToggle, opts = {}) {
-    opts.onToggle ??= onToggle;
+    if (typeof onToggle === `object`) {
+      opts = onToggle;
+    } else {
+      opts.onToggle ??= onToggle;
+    }
     super(text, Object.assign({}, Button.default, opts));
   }
 
+  get width() {
+    return super.width + this.padding * 2;
+  }
+
   async draw() {
-    return super.draw(`[${this.text}]`);
+    const { padding, text } = this;
+    const pad = ` `.repeat(padding);
+    return super.draw(`[${pad}${text}${pad}]`);
   }
 }
 

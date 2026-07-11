@@ -12,8 +12,12 @@ export class Page extends ItemComponent {
     Page.pages = {};
   }
 
+  static get(name) {
+    return Page.pages[name];
+  }
+
   static async load(name) {
-    const page = Page.pages[name];
+    const page = Page.get(name);
     if (!page) return;
     Screen.clear();
     await Page.setCurrentPage(page);
@@ -25,11 +29,11 @@ export class Page extends ItemComponent {
     await page.reflow();
     await page.select();
     await page.draw();
+    page.onLoad?.(page);
   }
 
   constructor(name, opts = {}) {
-    opts.name = name;
-    super(Object.assign({}, Page.default, opts));
+    super(name, Object.assign({}, Page.default, opts));
     const { padding } = Screen;
     this.row = 1 + padding;
     this.column = 1 + padding;
@@ -101,6 +105,10 @@ export class Page extends ItemComponent {
     item.column = this.column;
     items.push(item);
     return item;
+  }
+
+  get values() {
+    return this.items.map((item) => item.values).filter(Boolean);
   }
 
   reset() {

@@ -1,4 +1,3 @@
-
 import { ActionItem } from "./action-item.js";
 
 export class CheckboxItem extends ActionItem {
@@ -9,6 +8,13 @@ export class CheckboxItem extends ActionItem {
 
   constructor(text, opts = CheckboxItem.default) {
     super(text, Object.assign({}, CheckboxItem.default, opts));
+  }
+
+  get values() {
+    return {
+      name: this.text,
+      value: this.checked,
+    };
   }
 
   async toggle() {

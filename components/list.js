@@ -12,6 +12,7 @@ export class List extends ItemComponent {
   };
 
   constructor(name, type, opts = {}) {
+    opts.text = name;
     super(name, Object.assign({}, List.default, opts));
     this.type = type;
   }
@@ -57,6 +58,8 @@ export class List extends ItemComponent {
    * ...docs go here...
    */
   async reflow(rows, total) {
+    if (!this.resize) return 0;
+
     const { items, column, row } = this;
     const currentHeight = this.height;
 
@@ -68,7 +71,7 @@ export class List extends ItemComponent {
     const bottom = Screen.padding + Screen.innerHeight;
     while (ideal > 1 && row + ideal >= bottom) ideal--;
     this.skipSize = ideal;
-    const { skipSize } = this;
+    const skipSize = max(1, this.skipSize)
 
     const { length } = items;
     const d = ceil(length / skipSize);
@@ -105,10 +108,22 @@ export class CheckboxList extends List {
   constructor(name, opts = {}) {
     super(name, CheckboxItem, opts);
   }
+  get values() {
+    return {
+      name: this.text,
+      values: this.items.map((item) => item.values),
+    };
+  }
 }
 
 export class FilterList extends List {
   constructor(name, opts = {}) {
     super(name, FilterItem, opts);
+  }
+  get values() {
+    return {
+      name: this.text,
+      values: this.items.map((item) => item.values),
+    };
   }
 }
