@@ -17,6 +17,10 @@ export class Page extends ItemComponent {
     }, {});
   }
 
+  static get(name) {
+    return Page.pages[name];
+  }
+
   static reset() {
     const state = this.state;
     Page.pages = {};
@@ -24,7 +28,7 @@ export class Page extends ItemComponent {
   }
 
   static async load(name) {
-    const page = Page.pages[name];
+    const page = Page.get(name);
     if (!page) return;
     await Page.setCurrentPage(page);
   }
@@ -36,6 +40,7 @@ export class Page extends ItemComponent {
     await page.reflow();
     await page.select();
     await page.draw();
+    page.onLoad?.(page);
   }
 
   constructor(name, opts = {}) {

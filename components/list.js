@@ -62,7 +62,9 @@ export class List extends ItemComponent {
    * ...docs go here...
    */
   async reflow(rows, total) {
-    const { items, column, row } = this;
+    const { items, column, row, resize } = this;
+    if (!resize) return 0;
+
     const currentHeight = this.height;
 
     // Then check if we need to reflow
@@ -73,7 +75,7 @@ export class List extends ItemComponent {
     const bottom = Screen.padding + Screen.innerHeight;
     while (ideal > 1 && row + ideal >= bottom) ideal--;
     this.skipSize = ideal;
-    const { skipSize } = this;
+    const skipSize = max(1, this.skipSize);
 
     const { length } = items;
     const d = ceil(length / skipSize);

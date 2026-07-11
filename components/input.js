@@ -7,7 +7,7 @@ export class Input extends Text {
   static default = {
     userInput: ``,
     minWidth: 0,
-    emptyChar: `_`,
+    emptyChar: ` `,
   };
 
   cursor = 0;

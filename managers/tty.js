@@ -38,9 +38,9 @@ export const write = async (string) => {
 
 export const log = async (string) => {
   await Screen.setCursorForLogging();
-  const { width } = Screen;
-  string =
-    `LOG: ` + string + ` `.repeat(width - string.length - Screen.padding * 2);
+  const { innerWidth } = Screen;
+  const padding = ` `.repeat(innerWidth - string.length);
+  string = `LOG: ${string}${padding}`;
   return write(string);
 };
 

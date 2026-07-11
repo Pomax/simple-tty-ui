@@ -14,8 +14,9 @@ Of course, if if you insist on using NPM (which is fair enough, no shade) simply
 
 This UI library (lol) models your front end as one or more `Page`s, which consist of either:
 
-1. `Text` elements, which are plain inert text that auto-wrap based on terminal width, or
-1. `Button` elements, which can be selected and "do something" when the user presses space or enter.
+1. `Text` elements, which are plain inert text that auto-wrap based on terminal width,
+1. `Button` elements, which can be selected and "do something" when the user presses space or enter, and
+1. `Input` elements, which lets the user manually specify data for you to do something with.
 
 For convenience, there are a bunch of different ways to present buttons to the user:
 
@@ -32,159 +33,39 @@ That last one is particularly useful for UI that presents the user with overlapp
 There are two ways of monitoring UI state:
 
 1. All buttons trigger an `onToggle(button)` when toggled, which lets you do something the moment the user changes your UI state. The `button` argument will have a `.text` property as well as a `.checked` property that can be either `undefined` (button and filter), `true` (checkbox and filter), or `false` (checkbox and filter).
-2. `Page` instances have a `getState` which gives you a full state representation in the form of a standard JS object that you can walk through either using `Object.entries` or `JSON.stringify` with an inspection function as "replacer".
+2. `Page` instances have a `.state` property, which gives you a full state representation in the page's user-definable UI elements as an array of standard JS objects. To get "the full state of all pages", call the static `Page.state` rather than a page instance's `page.state`.
 
-## Example
+## An example
 
 ![the demo code](./screenshot.png)
 
-From the `demo.js` file:
+Run [node demo.js](demo.js) and have a look at how it does everything.
 
-```javascript
-import util from "node:util";
-import { Components, Colors, Screen, exit, setup } from "./index.js";
-const { ButtonList, ButtonGroup, CheckboxList, FilterList, Page, Text } =
-  Components;
-
-// Some colors, for doing a full menu recolor
-const colors = {
-  default: [`Default coloring`, [255, 255, 240], [20, 120, 55]],
-  safe: [`Safe content coloring`, [255, 255, 240], [20, 55, 120]],
-  danger: [`Not so safe coloring`, [255, 255, 240], [120, 55, 55]],
-};
-
-/**
- * Create our first (and currently only) page!
- */
-async function createMenu() {
-  const menu = new Page("main menu");
-
-  // some general information
-  const { bits } = Colors;
-  const { rows, columns, innerWidth, innerHeight } = Screen;
-  menu.add(
-    new Text(`
-        Test Application (dims = ${columns} x ${rows}, inner dims = ${innerWidth} x ${innerHeight}, ${bits} bit color).
-        Press 'q' or 'esc' to exit.
-      `),
-  );
-
-  // A filter list, with "yes/no/ignore" options:
-  const selection = menu.add(new FilterList(`filters`));
-  const test = 4;
-  for (let i = 0; i < test; i++) {
-    selection.add(`Let's try this.`, { checked: true });
-    selection.add(`Does this work?`, { checked: false });
-    selection.add(`How about this?`);
-    selection.add(`And this one?`);
-  }
-
-  menu.add(new Text(`This is a paragraph of text, followed by a checklist:`));
-
-  // A checkbox list, with "yes/no" options:
-  const checks = menu.add(new CheckboxList(`checks`));
-  for (let i = 0; i < test; i++) {
-    checks.add(`Yes or no?`, { checked: true });
-    checks.add(`What about maybe?`);
-    checks.add(`Are you sure?`, { checked: true });
-    checks.add(`No really?`);
-  }
-
-  menu.add(
-    new Text(
-      `Then another paragraph of text, followed by a list of possible actions:`,
-    ),
-  );
-
-  // An action list, where each option "does something"
-  const actions = menu.add(new ButtonList(`actions`));
-  Object.values(colors).forEach(([text, ...profile]) => {
-    actions.add(text, { onToggle: (btn) => setColorProfile(profile, btn) });
-  });
-
-  menu.add(
-    new Text(
-      `And another paragraph of text, followed by a few action buttons:`,
-    ),
-  );
-
-  // And a handy little button group
-  const buttons = menu.add(new ButtonGroup(`buttons`));
-  buttons.add(`go to submenu`, { onToggle: () => Page.load(`sub menu`) });
-  buttons.add(`reset`, { onToggle: () => draw(false) });
-  buttons.add(`exit`, { onToggle: () => exit() });
-}
-
-function createSubMenu() {
-  const page = new Page(`sub menu`);
-  page.add(
-    new Text(
-      `This is a sub menu demonstrator. There's not much here, just a way to get back to the main menu:`,
-    ),
-  );
-  page.add(new Button(`back`, { onToggle: () => Page.load(`main menu`) }));
-}
-
-/**
- * Helper function to set global colors.
- */
-async function setColorProfile(profile, component) {
-  await Colors.setColors(...profile);
-  await component?.select?.();
-  await draw();
-}
-
-/**
- * Fully draw our menus. This only gets called sparingly.
- */
-async function draw(redraw = true) {
-  if (!redraw) {
-    // If this is our first draw, set up default colors
-    const [_text, fg, bg] = colors.default;
-    await Colors.setColors(fg, bg);
-  }
-  await Screen.clear();
-  if (!redraw) {
-    // And if this is our first draw, create our
-    // menu and then select the first selectable.
-    createMenu();
-    createSubMenu();
-    await Page.load(`main menu`);
-  } else {
-    Page.current.draw();
-  }
-}
-
-// let's start our terminal app
-await setup(draw);
-```
-
-## API
+## Components and their API
 
 ### `Page`
 
-Models a single page in your menu system. Define as many as you want, and simply `.draw()` the one that needs to be shown.
+Models a single page in your menu system. Define as many as you want, and use `Page.load(somePageName)` to activate that page.
 
 ```js
 import { Components } from "simple-tty-ui";
 const { Page } = Components;
-const page = new Page("page name");
+const page = new Page(`page name`);
+Page.load(`page name`);
 ```
+
+#### constructor
+
+- `new Page(name)`
 
 #### properties
 
 - `.height` height in character rows
 - `.width` width in character columns
+- `.state` an object representation of this pages's state. Note that this only includes "stateful" content like checkboxes and input fields, not plain content like text or buttons.
 
 #### methods
 
-- `.draw()` draw this page to the screen
-- `.reflow()` ensure all content fits on the page
-- `.select()` selects the first selectable thing on this page. If called as `.select(true)`, selects the _last_ selectable thing instead.
-- `.unselect()` does the obvious
-- `.toggle()` trigger whichever element is currently selected.
-- `.previous()` select whichever selectable element precedes the current on. This behaviour wraps.
-- `.next()` select whichever selectable element follows the current on. This behaviour wraps.
 - `.add(item)` add an item to this page. returns the added item for convenience.
 
 #### Static `Page` properties
@@ -193,53 +74,62 @@ The `Page` class is special in that it tracks all pages in your menu system, and
 
 ##### properties
 
-- `.state` an object representation of the full state of your menu system. Note that this only includes "stateful" content like checkboxes and input fields, not plain content like text or buttons.
 - `.current` the currently active page.
 - `.pages` the object that tracks all pages, with the shape `{ [page.name]: page }`.
+- `.state` an object representation of the full state of your menu system. Note that this only includes "stateful" content like checkboxes and input fields, not plain content like text or buttons.
 
 ##### methods
 
 - `.reset` clears out any pages that were defined up to that point, returning the state of your page collection before resetting.
-- `.load(pagename: string)` loads a specific page as the active page that the users sees.
+- `.load(pagename)` loads a specific page as the active page that the users sees.
 - `.setCurrentPage(page)` while it is advisable to just use `load`, if you already have a `page` instance you can directly switch to that using this function.
 
 ### Text
 
+It's a text element. You use it to show text . It'll automatically wrap if there is more text than fits in the width of your terminal.
+
 ```js
 import { Components } from "simple-tty-ui";
 const { Page, Text } = Components;
-const page = new Page("page name");
-page.add(new Text("some text"));
+const page = new Page(`page name`);
+page.add(new Text(`some text`));
+Page.load(`page name`);
 ```
+
+#### constructor
+
+- `new Text(text)`
+
+That's it, it's a text element. It shows text. It'll auto-wrap if it has to. You don't get to control that behaviour.
 
 ### Input
 
-It's text, but you get to write it!
+A variation of the text element: this shows a text label plus an input field for the user to type in if the element is highlighted.
 
 ```js
 import { Components } from "simple-tty-ui";
-const { Page, Text } = Components;
-const page = new Page("page name");
-page.add(
-  new Input(`Fill in some text`, {
-    minWidth: 20,
-    emptyChar: `_`,
-    onToggle: ({ userInput }) => {
-      log(`user filled in: "${userInput}"`);
-    },
-  }),
-);
+const { Page, Input } = Components;
+const page = new Page(`page name`);
+page.add(new Input(`some text`));
+Page.load(`page name`);
 ```
 
-Input fields have a label and optional object with:
+#### constructor
 
-- `minWidth: number`, the minimum character width to show as field placeholder. Defaults to zero.
-- `emptyChar: string`, the character to use for empty space. Defaults to an underscore.
-- `onToggle`, a handler for when this option changes state, with `(thisInput)` as call argument.
+- `new Input(name, onToggle?, options?)`
+  - `name` required string
+  - `onToggle` an optional function of the form `(input) => { ... }` that triggers when the user hits "enter" while using the field, or navigates away from it after changing the value.
+  - `options` an optional object with additional construction properties.
+
+Valid `options` properties are:
+
+- `minWidth`, a number representing the minimal width of the input "field" in characters. Zero by default.
+- `emptyChar`, a character that is used to "take up empty space". This is a space by default.
+- `onToggle`, the same as the constructor argument, but lets you bypass specifying it as separate constructor argument if you're going to pass additional options.
 
 ### Button
 
-Like text, but it can do something!
+Like plain text, except it can do something!
 
 ```js
 import { Components } from "simple-tty-ui";
@@ -254,9 +144,21 @@ page.add(
 
 This will render as `[some text]` on the screen to make it obvious that it's a button.
 
+#### constructor
+
+- `new Button(text, onToggle?, options?)`.
+  - `text` required string
+  - `onToggle` an optional function of the form `(button) => { ... }` that triggers when the user hits "enter" or "space" with the button selected.
+  - `options` an optional object with additional construction properties.
+
+Additional properties are:
+
+- `padding`, the number of spaces to put between the "button decoration" and the buttoner text. This is 0 by default.
+- `onToggle`, the same as the constructor argument, but lets you bypass specifying it as separate constructor argument if you're going to pass additional options.
+
 ### ButtonGroup
 
-A group of buttons all on the same line.
+A convenient way to group multiple buttons on the same line, rather than as distinct page elements.
 
 ```js
 import { Components } from "simple-tty-ui";
@@ -271,9 +173,17 @@ buttons.add("other text", {
 });
 ```
 
+#### constructor
+
+- `new ButtonGroup(name)`
+
+#### methods
+
+- `.add(text, onToggle?, options?)` calls `new Button(text, onToggle, options)` and adds it to the group.
+
 ### ButtonList
 
-A list of items that act list buttons.
+It's a group of buttons, except as a list! Each button takes up its own row but without the spacing that you'd get if you added each button as its own on-page element.
 
 ```js
 import { Components } from "simple-tty-ui";
@@ -288,11 +198,23 @@ actions.add(`Do another thing`, {
 });
 ```
 
-The click handler gets passed the name of the list item in case you need to switch based on that name.
+#### constructor
+
+- `new ButtonList(name, options?)`
+  - `name` required name
+  - `options` an optional object with additional construction properties.
+
+Additional properties are:
+
+- `resize`, whether or not to automatically resize this list to fit the terminal. This defaults to `true` but some list UI should not be broken up, in which case you can explicitly pass `resize: false`.
+
+#### methods
+
+- `.add(text, onToggle?, options?)` calls `new Button(text, onToggle, options)` and adds it to the list.
 
 ### CheckboxList
 
-A list of, surprise, checkbox items. These can be either "true" or "false".
+It's a list of items that you can toggle! These can be either "true" or "false".
 
 ```js
 import { Components } from "simple-tty-ui";
@@ -304,14 +226,32 @@ options.add(`Do a thing`, { checked: true, onToggle: handleOption });
 options.add(`Do another thing`, { onToggle: handleOption });
 ```
 
-Chechbox items have a name and optional object with:
+#### constructor
 
-- `checked: bool`, the initial "checked or not" state. defaults to false.
-- `onToggle`, a handler for when this option changes state, with `(thisCheckboxItem)` as call argument.
+- `new CheckboxList(name, options?)`
+  - `name` required name
+  - `options` an optional object with additional construction properties.
+
+Additional properties are:
+
+- `resize`, whether or not to automatically resize this list to fit the terminal. This defaults to `true` but some list UI should not be broken up, in which case you can explicitly pass `resize: false`.
+
+#### properties
+
+- `.values` returns an object of the form `{ name: ..., values: [...] }` where each item in the `values` array is a `{ name: ..., value: ... }` corresponding to each item's name and `true`/`false` state.
+
+#### methods
+
+- `.add(text, onToggle?, options?)` calls `new CheckboxItem(text, onToggle, options)` and adds it to the list.
+
+The options may contain:
+
+- `checked` a boolean to prespecify this item's `true` or `false` state, defaulting to `false`.
+- `onToggle`, the same as the regular argument, but lets you bypass specifying it as separate function argument if you're going to pass additional options.
 
 ### FilterList
 
-A list of filter options, e.g. tristate "true", "false", and "undefined" items, useful for when you need both positive _and_ negative signals.
+A list of filter options, e.g. tristate "true", "false", and "undefined" items. Useful for when you need both positive _and_ negative signals.
 
 ```js
 import { Components } from "simple-tty-ui";
@@ -324,8 +264,9 @@ options.add(`Some other tag`, { checked: false, onToggle: updateContent });
 options.add(`And a third one`, { onToggle: updateContent });
 ```
 
-Filter items behave the same as checkbox items, except their `checked` property has three possible values, `true` for positive, `false` for negative, and `undefined ` (the default) for neither.
+Filter items behave the same as checkbox items, except their `checked` property has three possible values, `true` for positive, `false` for negative, and `undefined ` (the default) to indicate "unspecified".
 
+<!--
 ### Doing Color Stuff
 
 Colors are handled via the `Colors` object.
@@ -386,9 +327,15 @@ For "RGB" colors, call them with [r,g,b] arrays. This will use _the nearest cube
 
 For exact colors, only 24 bit color terminals will do what you want. You call the functions with [r,g,b] array inputs.
 
+-->
+
 ## This library is still 0.x
 
 It works, it does what I need, but there's still a bunch of code that's "more work than it should be" if you just need some menu pages so the API and default behaviour is still likely to change until I lock this as a v1 and walk away from it because "it just does what it needs to do and will never need to do more than that".
+
+## How come I can't do [...]??
+
+File an issue because obviously _I_ don't need that, but if I can see the use-case for it I have no problems adding it so that _you_ can use it.
 
 ## What's with the node warning?
 

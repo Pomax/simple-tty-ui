@@ -62,7 +62,7 @@ async function createMenu() {
   );
 
   // An action list, where each option "does something"
-  const actions = menu.add(new ButtonList(`actions`));
+  const actions = menu.add(new ButtonList(`actions`), { resize: false });
   Object.values(colors).forEach(([text, ...profile]) => {
     actions.add(text, (btn) => setColorProfile(profile, btn));
   });
@@ -98,12 +98,16 @@ async function createMenu() {
 }
 
 function createSubMenu() {
-  const page = new Page(`sub menu`);
+  const page = new Page(`sub menu`, {
+    onLoad: (page) => console.log(`\n\n`, Page.get(`main menu`).state),
+  });
+
   page.add(
     new Text(
       `This is a sub menu demonstrator. There's not much here, just a way to get back to the main menu:`,
     ),
   );
+
   page.add(new Button(`back`, { onToggle: () => Page.load(`main menu`) }));
 }
 
