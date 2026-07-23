@@ -4,7 +4,7 @@ For when you just need a simple terminal-based UI frontend for Node.js code.
 
 ## How to install this
 
-Not everything needs a `package.json` file, so just [download it](https://github.com/Pomax/simple-tty-ui/archive/refs/heads/main.zip) and unpack. And as a bonus, there's no auto-update mechanism to change what you downloaded into something else that logs your passwords and runs crypto mining on your GPU.
+Not everything needs a `package.json` file, so just [download it](https://github.com/Pomax/simple-tty-ui/archive/refs/heads/main.zip) and unpack (or git clone it, that'll work too). And as a bonus, there's no auto-update mechanism to change what you downloaded into something else that logs your passwords and runs crypto mining on your GPU.
 
 Of course, if if you insist on using NPM (which is fair enough, no shade) simply tell npm to install from github using `npm install https://github.com/Pomax/simple-tty-ui`, though I'd recommend having a look at what the current master commit hash is first, and then pinning it to that instead of course. Again: why would you want to auto-version-update something as simple as this?
 
